@@ -1,13 +1,14 @@
-
+import React from "react";
+import Home from "./pages/Home.jsx";
+import Nav from "./components/Nav.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <p>hello my blog posted</p>
+      <Nav />
+      <Home />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
