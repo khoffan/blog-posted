@@ -1,18 +1,16 @@
 import React from "react";
+import Blog from "../components/Blog.jsx";
 
-function Home() {
+function Home({ ImageUrl }) {
   return (
-    <div className="mx-60 my 100 py-20">
-      <div className="flex flex-row items-center">
-        <div className="mx-4 my-4">
-          <img src="../assets/profile-icon-9.png" />
-        </div>
-        <p>author </p>
-      </div>
-      <div>
-        <h1 className="text-3xl">title</h1>
-        <p>content</p>
-      </div>
+    <div className="mx-60 my 100 py-20 flex flex-col justify-center gap-10">
+      <Blog imageUrl={ImageUrl} />
+      <Blog imageUrl={ImageUrl} />
+      <Blog imageUrl={ImageUrl} />
+      <Blog imageUrl={ImageUrl} />
+      <Blog imageUrl={ImageUrl} />
+      <Blog imageUrl={ImageUrl} />
+      <Blog imageUrl={ImageUrl} />
     </div>
   );
 }
