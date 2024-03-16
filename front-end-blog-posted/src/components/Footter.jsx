@@ -2,10 +2,8 @@ import React from "react";
 
 export default function Footter() {
   return (
-    <>
-      <div className="p-12 flex flex-row justify-center items-center bg-black">
-        <footer className="text-white">© 2022</footer>
-      </div>
-    </>
+    <footer className="text-white bg-black flex justify-center p-10">
+      © 2022
+    </footer>
   );
 }

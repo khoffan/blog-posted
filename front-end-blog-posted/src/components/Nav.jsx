@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
+import { Link } from "react-router-dom";
 
 function Nav() {
   const [sreach, setSreach] = useState("");
@@ -29,7 +30,7 @@ function Nav() {
   return (
     <div className="flex flex-row items-center justify-between p-6 bg-red-500">
       <div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
-        Litium
+        <Link to="/">Litium</Link>
         <div className="mx-5">
           <input
             className="rounded-full px-5 text-l text-black input-field w-full py-1 px-2 text-lg focus:outline-none focus:shadow-outline "
@@ -57,13 +58,17 @@ function Nav() {
           </li>
           <li>
             <a href="#" className="text-white hover:text-gray-300">
-              Contact
+              Blog
             </a>
           </li>
         </ul>
         <div className="mx-5 flex flex-row justify-center space-x-4">
-          <ModifyButtonLogin variant="contained">login</ModifyButtonLogin>
-          <ModifyButtonSignUp variant="contained">signup</ModifyButtonSignUp>
+          <ModifyButtonLogin variant="contained">
+            <Link to="/login">login</Link>
+          </ModifyButtonLogin>
+          <ModifyButtonSignUp variant="contained">
+            <Link to="/signup">signup</Link>
+          </ModifyButtonSignUp>
         </div>
       </div>
     </div>
