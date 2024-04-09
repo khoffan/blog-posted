@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import CreatePost from "./pages/CreatePost.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <Register />,
+  },
+  {
+    path: "/create-blog",
+    element: <CreatePost />,
   },
 ]);
 

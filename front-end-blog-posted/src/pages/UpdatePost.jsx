@@ -1,16 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import Nav from "../components/Nav";
-
-function CreatePost() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-
+export default function UpdatePost() {
   return (
     <>
       <div className="flex flex-col min-h-screen bg-red-400">
         <Nav />
         <div className="w-1/2 border rounded-md p-2 mx-auto my-2 bg-white">
-          <h1 className="text-3xl">Create Post</h1>
+          <h1 className="text-3xl">Update Post</h1>
           <form className="mt-4 flex flex-col ">
             <div className="mb-6">
               <label
@@ -69,5 +65,3 @@ function CreatePost() {
     </>
   );
 }
-
-export default CreatePost;
