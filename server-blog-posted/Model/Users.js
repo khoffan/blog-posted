@@ -6,7 +6,7 @@ const Users = Schema(
   {
     first_name: {
       type: String,
-      required: true,
+      default: null,
     },
     last_name: {
       type: String,
@@ -15,6 +15,7 @@ const Users = Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
