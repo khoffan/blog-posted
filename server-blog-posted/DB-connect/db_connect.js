@@ -1,18 +1,11 @@
 const mongoose = require("mongoose");
 
 //connect to mongodb by use atlas
-
+const { MONG_URI } = process.env;
 const connectDB = async () => {
   try {
     await mongoose
-      .connect(
-        "mongodb+srv://admin:admin@cluster1.kn0o9e5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1",
-        {
-          useNewUrlParser: true, //to avoid warning
-          useUnifiedTopology: true,
-          useFindAndModify: false,
-        }
-      )
+      .connect(MONG_URI, {})
       .then(() => {
         console.log("Connected to DB");
       })
