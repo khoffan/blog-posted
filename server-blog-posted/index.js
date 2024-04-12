@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const connectDB = require("./DB-connect/db_connect");
 const Users = require("./Model/Users");
+const Blogs = require("./Model/Blogs");
 // connect to mongodb
 app.use(cookies());
 app.use(
@@ -78,7 +79,12 @@ app.post("/api/login", async (req, res) => {
           expiresIn: "2h",
         }
       );
-      user.token = token;
+      res.cookie("token", token, {
+        maxAge: 300000,
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+      });
       res.status(200).send({
         massage: "Login successfully",
         token,
@@ -93,6 +99,57 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+app.get("/api/profile", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      res.status(401).send({
+        massage: "Unauthenticated",
+      });
+    }
+
+    const verifyToken = jwt.verify(token, process.env.TOKEN_KEY);
+    if (verifyToken) {
+      const email = verifyToken.email;
+      const user = await Users.findOne({ email: email });
+      res.status(200).send({
+        massage: "User profile",
+        user,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(403).send({
+      massage: "Authentication failed",
+    });
+  }
+});
+
+// blogs api
+app.post("/api/creatBlogs", async (req, res) => {
+  const { title, description, author } = req.body;
+  if (!(title && description && author)) {
+    return res.status(400).send({
+      massage: "All input is required",
+    });
+  }
+  const blog = new Blogs({
+    title,
+    description,
+    author,
+  });
+  blog.save();
+  res.status(201).send({
+    massage: "Blog created successfully",
+    blog,
+  });
+});
+
+// get all blogs
+app.get("/api/getBlogs", async (req, res) => {
+  const blogs = await Blogs.find();
+  res.send(blogs);
+});
 app.listen(8001, () => {
   console.log(`Example app listening 8001`);
 });
