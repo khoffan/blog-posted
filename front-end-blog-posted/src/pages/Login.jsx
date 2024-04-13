@@ -1,8 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import Footter from "../components/Footter";
 import { Link } from "react-router-dom";
+import Fromfeild from "../components/Fromfeild";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [message, setMessage] = useState("");
+
+  const navigate = useNavigate();
+  const handleSubmitLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:8001/api/login",
+        {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response.data);
+      setMessage(response.data.massage);
+      setEmail("");
+      setPassword("");
+      navigate("/");
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setMessage(error.response.data.message);
+        console.log(error); // Use the error message from the server response if available
+      } else {
+        setMessage("Failed to login. Please try again later."); // Generic error message if no specific error message is available
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col min-h-screen">
@@ -22,23 +59,16 @@ export default function Login() {
                 Sing In
               </h1>
               <div className="border boerder-black p-auto flex flex-col justify-center items-center">
-                <label className="my-2 w-full" htmlFor="email">
-                  <span className="flex flex-col">Email</span>
-                  <input
-                    className="border rounded-md border-black my-1 px-2 w-full h-10"
-                    id="email"
-                    placeholder="email"
-                    type="email"
-                  />
-                </label>
-                <label className="my-2 w-full" htmlFor="password">
-                  <span className="flex flex-col">Password</span>
-                  <input
-                    className="border rounded-md border-black my-1  px-2 w-full h-10"
-                    placeholder="Password"
-                    type="password"
-                  />
-                </label>
+                <Fromfeild
+                  title="Email"
+                  value={email}
+                  onChange={(value) => setEmail(value)}
+                />
+                <Fromfeild
+                  value={password}
+                  title="Password"
+                  onChange={(value) => setPassword(value)}
+                />
                 <label className="inline-flex mt-3 items-center">
                   <span className="ml-2 text-gray-700 text-sm">
                     สมัครบัญชีได้ที่นี่
@@ -47,9 +77,14 @@ export default function Login() {
                     <span className="ml-2 text-red-500 text-sm">Register</span>
                   </Link>
                 </label>
-                <button className="my-5  text-white rounded-md bg-black hover:bg-gray-200 p-2 w-1/2 flex justify-center  hover:text-black hover:border hover:border-black ">
-                  <Link to="/create-blog">Login</Link>
+                <button
+                  type="submit"
+                  onClick={handleSubmitLogin}
+                  className="my-5  text-white rounded-md bg-black hover:bg-gray-200 p-2 w-1/2 flex justify-center  hover:text-black hover:border hover:border-black "
+                >
+                  Sing In
                 </button>
+                {message && <p>{message}</p>}
               </div>
             </div>
           </div>

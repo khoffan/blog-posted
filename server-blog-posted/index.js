@@ -17,7 +17,7 @@ const Blogs = require("./Model/Blogs");
 app.use(cookies());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -36,28 +36,46 @@ app.get("/", (req, res) => {
 app.post("/api/register", async (req, res) => {
   try {
     const { first_name, last_name, email, password } = req.body;
-    const passEndcript = await bcrypt.hash(password, 10);
+
+    // Check if all input is provided
     if (!(email && password && first_name && last_name)) {
-      res.status(400).send({
-        massage: "All input is required",
+      return res.status(400).send({
+        message: "กรุณากรอกข้อมูลให้ครบถ้วน",
       });
     }
+
+    // check if user already exist
+    const oldUser = await Users.findOne({ email });
+
+    if (oldUser) {
+      return res.status(409).send({
+        message: "อีเมลนี้มีผู้ใช้งานแล้ว",
+      });
+    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user instance
     const user = new Users({
       first_name,
       last_name,
       email,
-      password: passEndcript,
+      password: hashedPassword,
     });
-    user.save();
-    res.status(201).send({
-      massage: "User created successfully",
-      user,
+
+    // Save the user to the database
+    await user.save();
+
+    // Send success response
+    res.status(200).send({
+      message: "User created successfully",
     });
   } catch (err) {
     console.log(err);
+    // Send error response
     res.status(401).send({
-      massage: "Invalid email or password",
-      err,
+      message: "Invalid email or password",
+      error: err,
     });
   }
 });
@@ -67,7 +85,7 @@ app.post("/api/login", async (req, res) => {
     const { email, password } = req.body;
     if (!(email && password)) {
       res.status(400).send({
-        massage: "All input is required",
+        massage: "กรุณากรอกข้อมูลให้ครบถ้วน",
       });
     }
     const user = await Users.findOne({ email: email });
@@ -81,20 +99,17 @@ app.post("/api/login", async (req, res) => {
       );
       res.cookie("token", token, {
         maxAge: 300000,
-        secure: true,
         httpOnly: true,
-        sameSite: "none",
       });
       res.status(200).send({
         massage: "Login successfully",
-        token,
       });
     }
   } catch (err) {
     console.log(err);
-    res.status(401).send({
+    return res.status(401).send({
       massage: "Invalid email or password",
-      err,
+      error: err,
     });
   }
 });

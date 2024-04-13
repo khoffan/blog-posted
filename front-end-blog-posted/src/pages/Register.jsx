@@ -1,6 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Footter from "../components/Footter";
+import Fromfeild from "../components/Fromfeild";
 export default function Register() {
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [massage, setMassage] = useState("");
+
+  const clearValue = () => {
+    setFname("");
+    setLname("");
+    setEmail("");
+    setPassword("");
+  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:8001/api/register",
+        {
+          first_name: fname,
+          last_name: lname,
+          email: email,
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setMassage(response.data.message);
+      clearValue();
+    } catch (error) {
+      setMassage(error.response.data.message);
+    }
+  };
+
   return (
     <>
       <div className="flex flex-col min-h-screen">
@@ -14,38 +54,28 @@ export default function Register() {
                 Sing Up
               </h1>
               <div className="border boerder-black p-5 flex flex-col justify-center items-center">
-                <label className="my-2" htmlFor="Name">
-                  <span className="flex flex-col">Name</span>
-                  <input
-                    className="border rounded-md border-black my-1 px-2 w-full"
-                    placeholder="name"
-                    type="text"
-                  />
-                </label>
-                <label className="my-2" htmlFor="Name">
-                  <span className="flex flex-col">Last name</span>
-                  <input
-                    className="border rounded-md border-black px-2 my-1 w-full"
-                    placeholder="lastname"
-                    type="text"
-                  />
-                </label>
-                <label className="my-2" htmlFor="email">
-                  <span className="flex flex-col">Email</span>
-                  <input
-                    className="border rounded-md border-black my-1 px-2 w-full"
-                    placeholder="email"
-                    type="email"
-                  />
-                </label>
-                <label className="my-2" htmlFor="password">
-                  <span className="flex flex-col">Password</span>
-                  <input
-                    className="border rounded-md border-black my-1  px-2 w-full"
-                    placeholder="Password"
-                    type="password"
-                  />
-                </label>
+                <Fromfeild
+                  title="Name"
+                  value={fname}
+                  onChange={(value) => setFname(value)}
+                />
+                <Fromfeild
+                  title="Last Name"
+                  value={lname}
+                  onChange={(value) => {
+                    setLname(value);
+                  }}
+                />
+                <Fromfeild
+                  title="Email"
+                  value={email}
+                  onChange={(value) => setEmail(value)}
+                />
+                <Fromfeild
+                  title="Password"
+                  value={password}
+                  onChange={(value) => setPassword(value)}
+                />
                 <label className="inline-flex mt-3 items-center">
                   <input
                     type="checkbox"
@@ -55,9 +85,14 @@ export default function Register() {
                     กดที่นี่เพื่อยื่นยันข้อตกลง
                   </span>
                 </label>
-                <button className="my-5  text-white rounded-md bg-black hover:bg-gray-200 p-2 w-1/2 flex justify-center  hover:text-black hover:border hover:border-red ">
-                  <a className="">Sing Up</a>
+                <button
+                  type="submit"
+                  onClick={handleSubmit}
+                  className="my-5  text-white rounded-md bg-black hover:bg-gray-200 p-2 w-1/2 flex justify-center  hover:text-black hover:outline-black "
+                >
+                  Sign Up
                 </button>
+                {massage && <p>{massage}</p>}
               </div>
             </div>
           </div>
