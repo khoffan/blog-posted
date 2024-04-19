@@ -20,7 +20,7 @@ export default function Register() {
     event.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:8001/api/register",
+        "http://localhost:3001/api/register",
         {
           first_name: fname,
           last_name: lname,

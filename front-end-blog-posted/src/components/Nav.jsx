@@ -1,16 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Nav() {
   const [sreach, setSreach] = useState("");
+  const [isLogin, setIsLogin] = useState(false);
+  const [user, setUser] = useState({});
 
+  const navigate = useNavigate();
   const handleSreaching = (event) => {
     setSreach(event.target.value);
     console.log(sreach);
+  };
+
+  useEffect(() => {
+    handleResponse();
+  }, []);
+  const handleResponse = async () => {
+    try {
+      const res = await axios.get("http://localhost:3001/api/profile", {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(res.status);
+      if (res.data.statusbar === "success") {
+        setIsLogin(true);
+      }
+      setUser(res.data.user);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // Handle token expiration here, for example, by redirecting to the login page
+        setIsLogin(false);
+        alertToken().then(() => {
+          // Redirect to the login page after the alert is closed
+          const history = useHistory();
+          history.push("/login");
+        }); // You can also call your alertToken function here if needed
+      } else {
+        // Handle other types of errors
+        console.log("Error:", error);
+      }
+    }
+  };
+
+  const alertToken = () => {
+    return new Promise((resolve) => {
+      alert("Please login first", {
+        buttons: ["OK"],
+      }).then(() => {
+        resolve(); // Resolve the Promise when the alert is closed
+      });
+    });
   };
 
   const ModifyButtonLogin = styled(Button)(({ theme }) => ({
@@ -44,34 +90,47 @@ function Nav() {
           />
         </div>
       </div>
-
-      <div className="flex flex-row justify-center items-center mx-5">
-        <ul className="flex flex-row justify-center space-x-4">
-          <li>
-            <a href="#" className="text-white hover:text-gray-300">
-              Home
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-white hover:text-gray-300">
-              About
-            </a>
-          </li>
-          <li>
-            <a href="#" className="text-white hover:text-gray-300">
-              Blog
-            </a>
-          </li>
-        </ul>
-        <div className="mx-5 flex flex-row justify-center space-x-4">
-          <ModifyButtonLogin variant="contained">
-            <Link to="/login">login</Link>
-          </ModifyButtonLogin>
-          <ModifyButtonSignUp variant="contained">
-            <Link to="/signup">signup</Link>
-          </ModifyButtonSignUp>
+      {isLogin ? (
+        <div className="flex flex-row justify-center items-center">
+          <ul className="flex flex-row justify-center space-x-4">
+            <li>Blogs</li>
+          </ul>
+          <div className="block text-white border rounded-md p-2 mx-5">
+            <p>{user.first_name}</p>
+          </div>
+          <button className="block bg-white hover:bg-red-300 text-black font-bold py-2 px-4 rounded">
+            Logout
+          </button>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-row justify-center items-center mx-5">
+          <ul className="flex flex-row justify-center space-x-4">
+            <li>
+              <a href="#" className="text-white hover:text-gray-300">
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="#" className="text-white hover:text-gray-300">
+                About
+              </a>
+            </li>
+            <li>
+              <a href="#" className="text-white hover:text-gray-300">
+                Blog
+              </a>
+            </li>
+          </ul>
+          <div className="mx-5 flex flex-row justify-center space-x-4">
+            <ModifyButtonLogin variant="contained">
+              <Link to="/login">login</Link>
+            </ModifyButtonLogin>
+            <ModifyButtonSignUp variant="contained">
+              <Link to="/signup">signup</Link>
+            </ModifyButtonSignUp>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

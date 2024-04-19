@@ -130,12 +130,19 @@ app.get("/api/profile", async (req, res) => {
       res.status(200).send({
         massage: "User profile",
         user,
+        statusbar: "success",
+      });
+    } else {
+      res.status(401).send({
+        massage: "Unauthenticated",
+        statusbar: "failed",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(403).send({
       massage: "Authentication failed",
+      error,
     });
   }
 });
@@ -165,6 +172,8 @@ app.get("/api/getBlogs", async (req, res) => {
   const blogs = await Blogs.find();
   res.send(blogs);
 });
-app.listen(8001, () => {
-  console.log(`Example app listening 8001`);
+
+const port = process.env.POST || 3001;
+app.listen(port, () => {
+  console.log(`Example app listening ${port}`);
 });

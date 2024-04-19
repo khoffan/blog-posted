@@ -4,14 +4,9 @@ const mongoose = require("mongoose");
 const { MONG_URI } = process.env;
 const connectDB = async () => {
   try {
-    await mongoose
-      .connect(MONG_URI, {})
-      .then(() => {
-        console.log("Connected to DB");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    await mongoose.connect(MONG_URI).then(() => {
+      console.log("Connected to DB");
+    });
   } catch (error) {
     console.log(error);
   }
