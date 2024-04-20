@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Footter from "../components/Footter";
-import Fromfeild from "../components/Fromfeild";
+import Footter from "../../components/Footter";
+import Fromfeild from "../../components/Fromfeild";
 export default function Register() {
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");

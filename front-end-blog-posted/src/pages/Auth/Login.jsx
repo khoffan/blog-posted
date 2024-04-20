@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Footter from "../components/Footter";
+import Footter from "../../components/Footter";
 import { Link } from "react-router-dom";
-import Fromfeild from "../components/Fromfeild";
+import Fromfeild from "../../components/Fromfeild";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 

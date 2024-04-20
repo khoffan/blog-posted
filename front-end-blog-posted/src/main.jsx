@@ -8,9 +8,10 @@ import {
   Route,
   Link,
 } from "react-router-dom";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
-import CreatePost from "./pages/CreatePost.jsx";
+import Login from "./pages/Auth/Login.jsx";
+import Register from "./pages/Auth/Register.jsx";
+import CreatePost from "./pages/Posts/CreatePost.jsx";
+import Profile from "./pages/userProfile/Profile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/create-blog",
     element: <CreatePost />,
+  },
+  {
+    path: "/user/profile/:eamil",
+    element: <Profile />,
   },
 ]);
 

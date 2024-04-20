@@ -98,7 +98,7 @@ app.post("/api/login", async (req, res) => {
         }
       );
       res.cookie("token", token, {
-        maxAge: 300000,
+        maxAge: 30000000,
         httpOnly: true,
       });
       res.status(200).send({
@@ -147,6 +147,40 @@ app.get("/api/profile", async (req, res) => {
   }
 });
 
+app.put("/api/updateprofile/:id", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      res.status(401).send({
+        massage: "Unauthenticated",
+      });
+    }
+    const verifyToken = jwt.verify(token, process.env.TOKEN_KEY);
+    if (verifyToken) {
+      const { id } = req.params;
+      const { first_name, last_name, email } = req.body;
+
+      await Users.findByIdAndUpdate(id, {
+        first_name,
+        last_name,
+        email,
+      });
+      res.status(200).send({
+        massage: "User updated successfully",
+      });
+    } else {
+      res.status(401).send({
+        massage: "Unauthenticated",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(403).send({
+      massage: "Authentication failed",
+      error,
+    });
+  }
+});
 // blogs api
 app.post("/api/creatBlogs", async (req, res) => {
   const { title, description, author } = req.body;
