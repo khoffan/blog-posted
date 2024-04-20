@@ -154,6 +154,8 @@ app.put("/api/updateprofile/:id", async (req, res) => {
       res.status(401).send({
         massage: "Unauthenticated",
       });
+
+      return;
     }
     const verifyToken = jwt.verify(token, process.env.TOKEN_KEY);
     if (verifyToken) {
