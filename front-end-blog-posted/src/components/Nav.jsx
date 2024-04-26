@@ -29,19 +29,14 @@ function Nav() {
         },
       });
       console.log(res.status);
-      if (res.data.statusbar === "success") {
+      if (res.data.auth == true) {
         setIsLogin(true);
       }
       setUser(res.data.user);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Handle token expiration here, for example, by redirecting to the login page
-        setIsLogin(false);
-        alertToken().then(() => {
-          // Redirect to the login page after the alert is closed
-          const history = useHistory();
-          history.push("/login");
-        }); // You can also call your alertToken function here if needed
+        setIsLogin(false); // You can also call your alertToken function here if needed
       } else {
         // Handle other types of errors
         console.log("Error:", error);
@@ -49,19 +44,9 @@ function Nav() {
     }
   };
 
-  const alertToken = () => {
-    return new Promise((resolve) => {
-      alert("Please login first", {
-        buttons: ["OK"],
-      }).then(() => {
-        resolve(); // Resolve the Promise when the alert is closed
-      });
-    });
-  };
-
   const handleProfileNvigate = () => {
     if (isLogin) {
-      navigate(`/user/profile/${user._id}`, { state: { user: user } });
+      navigate(`/user/profile/${user._id}`);
       console.log(user.email);
     } else {
       navigate("/login");

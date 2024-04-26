@@ -11,7 +11,10 @@ export default function Login() {
 
   const [message, setMessage] = useState("");
 
+  const [checkAuth, setChackAuth] = useState(false);
+
   const navigate = useNavigate();
+
   const handleSubmitLogin = async (event) => {
     event.preventDefault();
     try {

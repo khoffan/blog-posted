@@ -12,6 +12,12 @@ import Login from "./pages/Auth/Login.jsx";
 import Register from "./pages/Auth/Register.jsx";
 import CreatePost from "./pages/Posts/CreatePost.jsx";
 import Profile from "./pages/userProfile/Profile.jsx";
+import ProtechRoute from "./components/protechRoute/ProtechRoute.jsx";
+import Cookies from "js-cookie";
+
+const handleauthProtech = () => {
+  return Cookies.get("token") !== null;
+};
 
 const router = createBrowserRouter([
   {
@@ -20,18 +26,26 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <ProtechRoute isAuth={handleauthProtech()} redirectPath="/">
+        <Login />
+      </ProtechRoute>
+    ),
   },
   {
     path: "/signup",
-    element: <Register />,
+    element: (
+      <ProtechRoute isAuth={handleauthProtech()} redirectPath="/">
+        <Register />
+      </ProtechRoute>
+    ),
   },
   {
     path: "/create-blog",
     element: <CreatePost />,
   },
   {
-    path: "/user/profile/:eamil",
+    path: "/user/profile/:id",
     element: <Profile />,
   },
 ]);

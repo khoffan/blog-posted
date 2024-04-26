@@ -11,8 +11,11 @@ const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 const connectDB = require("./DB-connect/db_connect");
+
+// import model
 const Users = require("./Model/Users");
 const Blogs = require("./Model/Blogs");
+const veriflyAuth = require("./middleware/veriflyAuth");
 // connect to mongodb
 app.use(cookies());
 app.use(
@@ -114,7 +117,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.get("/api/profile", async (req, res) => {
+app.get("/api/profile", veriflyAuth, async (req, res) => {
   try {
     const token = req.cookies.token;
     if (!token) {
@@ -130,18 +133,36 @@ app.get("/api/profile", async (req, res) => {
       res.status(200).send({
         massage: "User profile",
         user,
-        statusbar: "success",
+        auth: true,
       });
     } else {
       res.status(401).send({
         massage: "Unauthenticated",
-        statusbar: "failed",
+        auth: false,
       });
     }
   } catch (error) {
     console.log(error);
     res.status(403).send({
       massage: "Authentication failed",
+      error,
+    });
+  }
+});
+
+//get one profile user
+app.get("/api/profile/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Users.findById(id);
+    res.status(200).send({
+      massage: "profile found",
+      user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      massage: "profile not found",
       error,
     });
   }
@@ -208,7 +229,24 @@ app.get("/api/getBlogs", async (req, res) => {
   const blogs = await Blogs.find();
   res.send(blogs);
 });
+// get one blog
+app.get("/api/getBlogs/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const blog = await Blogs.findById(id);
+    resstatus(200).send({
+      message: "Blog found",
+      blog,
+    });
+  } catch (error) {
+    res.status(400).send({
+      message: "Blog not found",
+      error,
+    });
+  }
+});
 
+//listen server
 const port = process.env.POST || 3001;
 app.listen(port, () => {
   console.log(`Example app listening ${port}`);

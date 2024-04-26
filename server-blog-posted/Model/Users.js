@@ -21,6 +21,14 @@ const Users = Schema(
       type: String,
       required: true,
     },
+    image_path: {
+      type: String,
+      default: null,
+    },
+    image_name: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,
