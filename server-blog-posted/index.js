@@ -1,5 +1,4 @@
 // build express example code
-
 const express = require("express");
 const app = express();
 const http = require("http");
@@ -8,6 +7,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const cookies = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
 
 require("dotenv").config();
 const connectDB = require("./DB-connect/db_connect");
@@ -16,6 +16,20 @@ const connectDB = require("./DB-connect/db_connect");
 const Users = require("./Model/Users");
 const Blogs = require("./Model/Blogs");
 const veriflyAuth = require("./middleware/veriflyAuth");
+
+//upload file disk stroage multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    const fileName = Date.now() + "-" + file.originalname;
+    cb(null, fileName);
+  },
+});
+
+const upload = multer({ storage });
+
 // connect to mongodb
 app.use(cookies());
 app.use(
@@ -107,6 +121,10 @@ app.post("/api/login", async (req, res) => {
       res.status(200).send({
         massage: "Login successfully",
       });
+    } else {
+      return res.status(400).send({
+        massage: "Invalid email or password",
+      });
     }
   } catch (err) {
     console.log(err);
@@ -168,34 +186,29 @@ app.get("/api/profile/:id", async (req, res) => {
   }
 });
 
-app.put("/api/updateprofile/:id", async (req, res) => {
+app.put("/api/updateprofile/:id", upload.single("file"), async (req, res) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      res.status(401).send({
-        massage: "Unauthenticated",
-      });
+    const { id } = req.params;
+    const { first_name, last_name } = req.body;
+    const fileSelacter = req.file;
+    console.log(fileSelacter);
 
-      return;
-    }
-    const verifyToken = jwt.verify(token, process.env.TOKEN_KEY);
-    if (verifyToken) {
-      const { id } = req.params;
-      const { first_name, last_name, email } = req.body;
-
-      await Users.findByIdAndUpdate(id, {
-        first_name,
-        last_name,
-        email,
-      });
-      res.status(200).send({
-        massage: "User updated successfully",
-      });
-    } else {
-      res.status(401).send({
-        massage: "Unauthenticated",
+    // Check if user exists
+    const user = await Users.findById(id);
+    if (!user) {
+      return res.status(404).send({
+        massage: "User not found",
       });
     }
+    await Users.findByIdAndUpdate(id, {
+      first_name,
+      last_name,
+      image_path: fileSelacter ? fileSelacter.path : null,
+      image_name: fileSelacter ? fileSelacter.originalname : null,
+    });
+    res.status(200).send({
+      massage: "User updated successfully",
+    });
   } catch (error) {
     console.log(error);
     res.status(403).send({
@@ -204,6 +217,7 @@ app.put("/api/updateprofile/:id", async (req, res) => {
     });
   }
 });
+
 // blogs api
 app.post("/api/creatBlogs", async (req, res) => {
   const { title, description, author } = req.body;
