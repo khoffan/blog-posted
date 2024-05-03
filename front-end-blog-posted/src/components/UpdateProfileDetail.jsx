@@ -3,9 +3,9 @@ import axios from "axios";
 import Nav from "./Nav";
 import Footter from "./Footter";
 import { useNavigate } from "react-router-dom";
-export default function DetailProfile({ id }) {
+export default function UpdateProfileDetail({ id }) {
   const [user, setuser] = useState({});
-  const [image, setimage] = useState("");
+  const [imageurl, setImageurl] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
     fetchData();
@@ -15,33 +15,60 @@ export default function DetailProfile({ id }) {
       const response = await axios.get(
         `http://localhost:3001/api/profile/${id}`
       );
-      //console.log(response.data);
+      //  console.log(response.data);
       setuser(response.data.user);
-      setimage(response.data.user.image_path);
+      setImageurl(response.data.user.image_path);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleUpdateProfile = () => {
-    navigate(`/user/editprofile/${id}`);
+  const handleChangImage = async (event) => {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    console.log(file);
+    formData.append("file", file);
+    try {
+      const response = await axios.put(
+        `http://localhost:3001/api/updateprofile/${id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(response.data);
+      setImageurl(response.data.image_path);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <>
       <div className="max-w-screen min-h-screen bg-red-400 ">
         <Nav />
-        <div className="max-w-[1000px] h-[600px]  border border-blue-400 rounded-md mx-auto bg-white ">
-          <div className="relative left-[400px] mb-4">
-            <img
-              className="max-w-fit max-h-fit cornered-full rounded-full mb-4"
-              src={
-                image
-                  ? `http://localhost:3001/${image}`
-                  : "https://picsum.photos/200"
-              }
-              alt="profile"
+        <div className="max-w-[1000px] h-[600px] rounded-md mx-auto bg-white ">
+          <div className="relative left-[400px] mb-4 bg-cover bg-no-repeat bg-center">
+            <input
+              type="file"
+              id="file-input"
+              onChange={handleChangImage}
+              className="hidden" // Hides the default input
             />
+            <label
+              htmlFor="file-input" // Links the label to the hidden file input
+              className="cursor-pointer text-xl text-blue-500 flex "
+            >
+              <img
+                className="w-[200px] h-[200px] rounded-full mb-4 object-cover"
+                src={
+                  imageurl ? `http://localhost:3001/${imageurl}` : "no image"
+                }
+                alt="profile"
+              />
+            </label>
           </div>
           <div className="flex flex-col justify-start items-start relative h-[300px] bg-blue-300">
             <div className="grid grid-cols-3 gap-4 border-b-2 border-black w-full h-[400px]">
@@ -58,17 +85,6 @@ export default function DetailProfile({ id }) {
                 <p className="text-xl text-bottom m-4">number of blogs</p>
               </div>
             </div>
-          </div>
-          <div className="flex flex-row justify-evenly items-center relative   pt-2 w-full h-[80px]">
-            <button
-              className="w-48 mx-[50px] px-2 py-2 bg-black text-white h-[50px] rounded-full"
-              onClick={handleUpdateProfile}
-            >
-              Update Profile
-            </button>
-            <button className="w-48 px-2 py-2 h-[50px] rounded-full bg-red-400">
-              Delate
-            </button>
           </div>
         </div>
       </div>

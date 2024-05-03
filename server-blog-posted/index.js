@@ -40,6 +40,8 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/uploads", express.static("uploads"));
 connectDB();
 // support json encoded bodies
 
@@ -191,16 +193,17 @@ app.put("/api/updateprofile/:id", upload.single("file"), async (req, res) => {
     const { id } = req.params;
     const { first_name, last_name } = req.body;
     const fileSelacter = req.file;
+    let _id = id;
     console.log(fileSelacter);
 
     // Check if user exists
-    const user = await Users.findById(id);
+    const user = await Users.findById(_id);
     if (!user) {
       return res.status(404).send({
         massage: "User not found",
       });
     }
-    await Users.findByIdAndUpdate(id, {
+    await Users.findByIdAndUpdate(_id, {
       first_name,
       last_name,
       image_path: fileSelacter ? fileSelacter.path : null,

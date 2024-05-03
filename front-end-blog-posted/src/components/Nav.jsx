@@ -10,6 +10,7 @@ function Nav() {
   const [sreach, setSreach] = useState("");
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState({});
+  const [isImage, setIsIMage] = useState(false);
 
   const navigate = useNavigate();
   const handleSreaching = (event) => {
@@ -33,6 +34,10 @@ function Nav() {
         setIsLogin(true);
       }
       setUser(res.data.user);
+      if (res.data.user.image_path) {
+        setIsIMage(true);
+      }
+      console.log(res.data.user.image_path);
     } catch (error) {
       if (error.response && error.response.status === 401) {
         // Handle token expiration here, for example, by redirecting to the login page
@@ -105,7 +110,11 @@ function Nav() {
             <div className="block w-10 h-10 mx-2">
               <img
                 className="rounded-full"
-                src="https://via.placeholder.com/150"
+                src={
+                  isImage
+                    ? `http://localhost:3001/${user.image_path}`
+                    : "https://via.placeholder.com/150"
+                }
                 alt=""
                 onClick={handleProfileNvigate}
               />

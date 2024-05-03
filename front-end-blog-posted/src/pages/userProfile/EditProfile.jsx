@@ -1,9 +1,13 @@
 import React from "react";
+import { useParams } from "react-router-dom";
+import UpdateProfileDetail from "../../components/UpdateProfileDetail";
 
 export default function EditProfile() {
+  const { id } = useParams();
+
   return (
-    <div>
-      <h1>Edit Profile</h1>
-    </div>
+    <>
+      <UpdateProfileDetail id={id} />
+    </>
   );
 }
