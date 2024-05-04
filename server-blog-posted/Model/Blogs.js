@@ -12,8 +12,14 @@ const Blogs = Schema(
       default: null,
     },
     author: {
-      type: String,
-      default: null,
+      name: {
+        type: String,
+        default: null,
+      },
+      email: {
+        type: String,
+        default: null,
+      },
     },
   },
   {

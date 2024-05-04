@@ -222,23 +222,30 @@ app.put("/api/updateprofile/:id", upload.single("file"), async (req, res) => {
 });
 
 // blogs api
-app.post("/api/creatBlogs", async (req, res) => {
-  const { title, description, author } = req.body;
-  if (!(title && description && author)) {
-    return res.status(400).send({
-      massage: "All input is required",
+app.post("/api/creatBlogs", veriflyAuth, async (req, res) => {
+  try {
+    const { title, description, author } = req.body;
+    if (!(title && description && author)) {
+      return res.status(400).send({
+        massage: "All input is required",
+      });
+    }
+    const blog = new Blogs({
+      title,
+      description,
+      author,
+    });
+    blog.save();
+    res.status(201).send({
+      massage: "Blog created successfully",
+      blog,
+    });
+  } catch (error) {
+    return res.status(401).send({
+      massage: "creat blogs unsuccess",
+      error,
     });
   }
-  const blog = new Blogs({
-    title,
-    description,
-    author,
-  });
-  blog.save();
-  res.status(201).send({
-    massage: "Blog created successfully",
-    blog,
-  });
 });
 
 // get all blogs

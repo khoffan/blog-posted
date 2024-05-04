@@ -21,7 +21,7 @@ const handleauthProtech = () => {
   if (!token) {
     return false;
   }
-  return token;
+  return true;
 };
 
 const router = createBrowserRouter([
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/create-blog",
+    path: "/create-blog/:id",
     element: <CreatePost />,
   },
   {

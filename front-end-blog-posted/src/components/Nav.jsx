@@ -57,6 +57,14 @@ function Nav() {
       navigate("/login");
     }
   };
+  const handletoWriteblog = () => {
+    if (isLogin) {
+      navigate(`/create-blog/${user._id}`);
+      console.log(user.email);
+    } else {
+      navigate("/");
+    }
+  };
 
   const ModifyButtonLogin = styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(grey[900]),
@@ -93,7 +101,7 @@ function Nav() {
         <div className="flex flex-row justify-center items-center ">
           <ul className="flex flex-row justify-center space-x-4 mx-5">
             <li>Blogs</li>
-            <li className="mx-5">
+            <li className="mx-5" onClick={handletoWriteblog}>
               <Link
                 className="text-white hover:text-gray-300"
                 to="/create-blog"
@@ -107,18 +115,17 @@ function Nav() {
           </button>
           <div className="flex flex-row justify-center items-center mx-5">
             <p className="text-white text-lg">{user.first_name}</p>
-            <div className="block w-10 h-10 mx-2">
-              <img
-                className="rounded-full"
-                src={
-                  isImage
-                    ? `http://localhost:3001/${user.image_path}`
-                    : "https://via.placeholder.com/150"
-                }
-                alt=""
-                onClick={handleProfileNvigate}
-              />
-            </div>
+
+            <img
+              className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
+              src={
+                isImage
+                  ? `http://localhost:3001/${user.image_path}`
+                  : "https://via.placeholder.com/150"
+              }
+              alt=""
+              onClick={handleProfileNvigate}
+            />
           </div>
         </div>
       ) : (

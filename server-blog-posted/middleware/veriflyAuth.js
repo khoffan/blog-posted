@@ -14,7 +14,7 @@ const veriflyAuth = (req, res, next) => {
   if (verifyToken) {
     next();
   } else {
-    res.status(401).send({
+    return res.status(401).send({
       massage: "Unauthenticated",
       auth: false,
     });
