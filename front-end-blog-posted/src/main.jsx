@@ -32,7 +32,7 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: (
-      <ProtechRoute isAuth={handleauthProtech} redirectPath="/">
+      <ProtechRoute isAuth={handleauthProtech()} redirectPath="/">
         <Login />
       </ProtechRoute>
     ),
@@ -40,7 +40,7 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: (
-      <ProtechRoute isAuth={handleauthProtech} redirectPath="/">
+      <ProtechRoute isAuth={handleauthProtech()} redirectPath="/">
         <Register />
       </ProtechRoute>
     ),

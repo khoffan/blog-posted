@@ -3,19 +3,20 @@ import axios from "axios";
 import Blog from "../components/Blog.jsx";
 import Nav from "../components/Nav.jsx";
 import Footter from "../components/Footter.jsx";
+import Tagbar from "../components/Tagbar.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 
 function Home({ ImageUrl }) {
-  const [content, setContent] = useState([
-    {
-      title: "My Title",
-      content:
-        "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Neque vel, quas nesciunt quae, perferendis obcaecati quo voluptatum, ratione possimus iusto atque reprehenderit architecto nisi itaque. Repellat vero cumque incidunt. Expedita at facere temporibus vitae, repellat aliquid fugiat illum iure? Modi eos ratione ipsa sed repellendus recusandae, cumque quidem, nostrum ex consequuntur natus eius ut libero, pariatur maxime optio vel corporis beatae dignissimos. Praesentium, rem quod consequuntur consequatur doloremque deleniti enim minus aliquam ratione accusamus laborum nobis quaerat? Sit aperiam repellendus odio, expedita doloremque, sint aut incidunt dolore perspiciatis quidem, illum dicta vero nam tempore suscipit harum culpa quas molestiae porro",
-    },
-  ]);
+  const [content, setContent] = useState([]);
 
+  useEffect(() => {
+    getData();
+  }, []);
   const getData = async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/blogs");
+      //console.log(response.data.blogs);
+      setContent(response.data.blogs);
     } catch (error) {
       console.log(error);
     }
@@ -23,7 +24,22 @@ function Home({ ImageUrl }) {
   return (
     <>
       <Nav />
-      <div className="mx-60 my 100 py-20 flex flex-col justify-center gap-10"></div>
+      <div className="h-screen pt-[20px] grid grid-row-3 grid-flow-col row-auto gab-4">
+        <Sidebar />
+        <Tagbar />
+
+        <div className="row-span-2 h-full col-span-2 border border-black ">
+          {content.map((blog) => (
+            <Blog
+              key={blog._id}
+              name={blog.author.name}
+              title={blog.title}
+              content={blog.description}
+              creatDate={blog.createdAt}
+            />
+          ))}
+        </div>
+      </div>
       <Footter />
     </>
   );

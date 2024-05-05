@@ -249,12 +249,22 @@ app.post("/api/creatBlogs", veriflyAuth, async (req, res) => {
 });
 
 // get all blogs
-app.get("/api/getBlogs", async (req, res) => {
-  const blogs = await Blogs.find();
-  res.send(blogs);
+app.get("/api/blogs", async (req, res) => {
+  try {
+    const blogs = await Blogs.find();
+    return res.status(200).send({
+      message: "Blogs found",
+      blogs,
+    });
+  } catch (error) {
+    return res.status(401).send({
+      massage: "get blogs unsuccess",
+      error,
+    });
+  }
 });
 // get one blog
-app.get("/api/getBlogs/:id", async (req, res) => {
+app.get("/api/blogs/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const blog = await Blogs.findById(id);
