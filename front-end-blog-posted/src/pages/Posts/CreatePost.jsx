@@ -26,6 +26,7 @@ function CreatePost() {
       setAuthor({
         name: autherRes.firstname + " " + autherRes.last_name,
         email: autherRes.email,
+        image: autherRes.image_path,
       });
     } catch (error) {
       console.error(error);

@@ -33,6 +33,7 @@ export default function UpdateProfileDetail({ id }) {
         `http://localhost:3001/api/updateprofile/${id}`,
         formData,
         {
+          withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
           },

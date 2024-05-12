@@ -19,8 +19,10 @@ function Nav() {
   };
 
   useEffect(() => {
-    handleResponse();
-  }, []);
+    if (!isLogin) {
+      handleResponse();
+    }
+  }, [isLogin]);
   const handleResponse = async (e) => {
     try {
       const res = await axios.get("http://localhost:3001/api/profile", {
@@ -65,6 +67,30 @@ function Nav() {
       navigate("/");
     }
   };
+  const handletoblogpage = () => {
+    if (isLogin) {
+      navigate(`/blog/${user._id}`);
+      console.log(user.email);
+    } else {
+      navigate("/");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post("http://localhost:3001/api/logout", null, {
+        withCredentials: true,
+      });
+      if (res.status === 200) {
+        setIsLogin(false);
+        alert(res.data.massage);
+        navigate("/", { state: { isLogin: true } });
+      }
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const ModifyButtonLogin = styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(grey[900]),
@@ -82,7 +108,7 @@ function Nav() {
   }));
 
   return (
-    <div className="flex flex-row items-center justify-between p-6 bg-red-500">
+    <div className="sticky z-50 top-0 w-full flex flex-row items-center justify-between p-6 bg-red-500">
       <div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
         <Link to="/">Litium</Link>
         <div className="mx-5">
@@ -100,17 +126,17 @@ function Nav() {
       {isLogin ? (
         <div className="flex flex-row justify-center items-center ">
           <ul className="flex flex-row justify-center space-x-4 mx-5">
-            <li>Blogs</li>
-            <li className="mx-5" onClick={handletoWriteblog}>
-              <Link
-                className="text-white hover:text-gray-300"
-                to="/create-blog"
-              >
-                Write Blog
-              </Link>
+            <li className="mx-5 hover:text-white" onClick={handletoblogpage}>
+              Blogs
+            </li>
+            <li className="mx-5 hover:text-white" onClick={handletoWriteblog}>
+              Write Blog
             </li>
           </ul>
-          <button className="block bg-white hover:bg-red-300 text-black font-bold py-2 px-4 rounded">
+          <button
+            className="block bg-white hover:bg-red-300 text-black font-bold py-2 px-4 rounded"
+            onClick={handleLogout}
+          >
             Logout
           </button>
           <div className="flex flex-row justify-center items-center mx-5">

@@ -15,13 +15,14 @@ import CreatePost from "./pages/Posts/CreatePost.jsx";
 import Profile from "./pages/userProfile/Profile.jsx";
 import ProtechRoute from "./components/protechRoute/ProtechRoute.jsx";
 import EditProfile from "./pages/userProfile/EditProfile.jsx";
+import Blogspage from "./pages/Posts/Blogspage.jsx";
 
 const handleauthProtech = () => {
-  let token = Cookies.get("token");
-  if (!token) {
-    return false;
-  }
-  return true;
+  console.log(Cookies.get("token", { sameSite: "none", secure: true }));
+  //if (!token || token == undefined) {
+  //  return false;
+  //}
+  //return true;
 };
 
 const router = createBrowserRouter([
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
         <Register />
       </ProtechRoute>
     ),
+  },
+  {
+    path: "blog/:id",
+    element: <Blogspage />,
   },
   {
     path: "/create-blog/:id",

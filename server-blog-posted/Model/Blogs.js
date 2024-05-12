@@ -20,6 +20,10 @@ const Blogs = Schema(
         type: String,
         default: null,
       },
+      image: {
+        type: String,
+        default: null,
+      },
     },
   },
   {

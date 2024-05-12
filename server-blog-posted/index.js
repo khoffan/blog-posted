@@ -5,7 +5,7 @@ const http = require("http");
 const server = http.createServer(app);
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const cookies = require("cookie-parser");
+const CookiesParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 
@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // connect to mongodb
-app.use(cookies());
+app.use(CookiesParser());
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -119,6 +119,8 @@ app.post("/api/login", async (req, res) => {
       res.cookie("token", token, {
         maxAge: 30000000,
         httpOnly: true,
+        //secure: true,
+        sameSite: "lax",
       });
       res.status(200).send({
         massage: "Login successfully",
@@ -137,11 +139,33 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+app.post("/api/logout", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    console.log(token);
+    if (token) {
+      res.clearCookie("token");
+      res.status(200).send({
+        massage: "Logout successfully",
+      });
+    }
+    return res.status(401).send({
+      massage: "Unauthenticated",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(401).send({
+      massage: "Invalid email or password",
+      error: error.massage,
+    });
+  }
+});
+
 app.get("/api/profile", veriflyAuth, async (req, res) => {
   try {
     const token = req.cookies.token;
     if (!token) {
-      res.status(401).send({
+      return res.status(401).send({
         massage: "Unauthenticated",
       });
     }
@@ -165,7 +189,7 @@ app.get("/api/profile", veriflyAuth, async (req, res) => {
     console.log(error);
     res.status(403).send({
       massage: "Authentication failed",
-      error,
+      error: error.massage,
     });
   }
 });
@@ -191,6 +215,12 @@ app.get("/api/profile/:id", async (req, res) => {
 app.put("/api/updateprofile/:id", upload.single("file"), async (req, res) => {
   try {
     const { id } = req.params;
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).send({
+        massage: "Unauthenticated",
+      });
+    }
     const { first_name, last_name } = req.body;
     const fileSelacter = req.file;
     let _id = id;
@@ -248,8 +278,34 @@ app.post("/api/creatBlogs", veriflyAuth, async (req, res) => {
   }
 });
 
+app.put("/api/updateblog/:id", veriflyAuth, async (req, res) => {
+  try {
+    const { title, description, author } = req.body;
+    if (!(title && description && author)) {
+      return res.status(400).send({
+        massage: "All input is required",
+      });
+    }
+    const blog = new Blogs({
+      title,
+      description,
+      author,
+    });
+    blog.save();
+    res.status(201).send({
+      massage: "Blog created successfully",
+      blog,
+    });
+  } catch (error) {
+    return res.status(401).send({
+      massage: "creat blogs unsuccess",
+      error,
+    });
+  }
+});
+
 // get all blogs
-app.get("/api/blogs", async (req, res) => {
+app.get("/api/blogs", veriflyAuth, async (req, res) => {
   try {
     const blogs = await Blogs.find();
     return res.status(200).send({
@@ -259,7 +315,7 @@ app.get("/api/blogs", async (req, res) => {
   } catch (error) {
     return res.status(401).send({
       massage: "get blogs unsuccess",
-      error,
+      error: error.massage,
     });
   }
 });
