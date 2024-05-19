@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
-import Cookies from "js-cookie";
+//import Cookies from "js-cookie";
+import axios from "axios";
 import "./index.css";
 import {
   createBrowserRouter,
@@ -16,14 +17,9 @@ import Profile from "./pages/userProfile/Profile.jsx";
 import ProtechRoute from "./components/protechRoute/ProtechRoute.jsx";
 import EditProfile from "./pages/userProfile/EditProfile.jsx";
 import Blogspage from "./pages/Posts/Blogspage.jsx";
+import BlogDetail from "./pages/Posts/BlogDetail.jsx";
 
-const handleauthProtech = () => {
-  console.log(Cookies.get("token", { sameSite: "none", secure: true }));
-  //if (!token || token == undefined) {
-  //  return false;
-  //}
-  //return true;
-};
+//server side for protect route
 
 const router = createBrowserRouter([
   {
@@ -31,9 +27,13 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
+    path: "/home",
+    element: <App />,
+  },
+  {
     path: "/login",
     element: (
-      <ProtechRoute isAuth={handleauthProtech()} redirectPath="/">
+      <ProtechRoute redirectPath="/home">
         <Login />
       </ProtechRoute>
     ),
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: (
-      <ProtechRoute isAuth={handleauthProtech()} redirectPath="/">
+      <ProtechRoute redirectPath="/home">
         <Register />
       </ProtechRoute>
     ),
@@ -61,6 +61,10 @@ const router = createBrowserRouter([
   {
     path: "/user/editprofile/:id",
     element: <EditProfile />,
+  },
+  {
+    path: "/blog/deatil/:id",
+    element: <BlogDetail />,
   },
 ]);
 

@@ -6,6 +6,7 @@ const server = http.createServer(app);
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const CookiesParser = require("cookie-parser");
+const session = require("express-session");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 
@@ -37,6 +38,9 @@ app.use(
     origin: "http://localhost:5173",
     credentials: true,
   })
+);
+app.use(
+  session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -119,10 +123,10 @@ app.post("/api/login", async (req, res) => {
       res.cookie("token", token, {
         maxAge: 30000000,
         httpOnly: true,
-        //secure: true,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
       });
-      res.status(200).send({
+      return res.status(200).send({
         massage: "Login successfully",
       });
     } else {
@@ -145,7 +149,7 @@ app.post("/api/logout", async (req, res) => {
     console.log(token);
     if (token) {
       res.clearCookie("token");
-      res.status(200).send({
+      return res.status(200).send({
         massage: "Logout successfully",
       });
     }
@@ -157,6 +161,21 @@ app.post("/api/logout", async (req, res) => {
     return res.status(401).send({
       massage: "Invalid email or password",
       error: error.massage,
+    });
+  }
+});
+
+app.get("/protected-route", veriflyAuth, (req, res) => {
+  try {
+    return res.status(200).send({
+      massage: "Welcome to protected route",
+      protect: true,
+    });
+  } catch (error) {
+    return res.status(401).send({
+      massage: "Unauthenticated",
+      error: error.massage,
+      protect: false,
     });
   }
 });
@@ -320,11 +339,11 @@ app.get("/api/blogs", veriflyAuth, async (req, res) => {
   }
 });
 // get one blog
-app.get("/api/blogs/:id", async (req, res) => {
+app.get("/api/blog/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const blog = await Blogs.findById(id);
-    resstatus(200).send({
+    return res.status(200).send({
       message: "Blog found",
       blog,
     });

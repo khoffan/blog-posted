@@ -5,22 +5,18 @@ import Footter from "../components/Footter.jsx";
 import Tagbar from "../components/Tagbar.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 function Home({ isLogin }) {
   const [content, setContent] = useState([]);
   const [isLoading, setIsloading] = useState(false);
   const [isToken, setIsToken] = useState(false);
 
-  const token = Cookies.get();
-  console.log(token);
+  const navigate = useNavigate();
+  //console.log(token);
   useEffect(() => {
-    if (token) {
-      setIsToken(true);
-    }
-    if (isToken || isLoading == false) {
-      getData();
-    }
-  }, [isToken]);
+    getData();
+  }, []);
   const getData = async () => {
     setIsloading(true);
     try {
@@ -35,24 +31,31 @@ function Home({ isLogin }) {
       setIsloading(false);
     }
   };
+
+  const blogDeatil = (id) => {
+    navigate(`/blog/deatil/${id}`);
+    return false;
+  };
+
   return (
     <>
-      <div className="h-screen pt-[20px] grid grid-row-4 grid-flow-col row-auto gab-4">
+      <div className="h-screen pt-[20px] grid grid-row-3 grid-flow-col row-auto gab-4">
         <Sidebar />
-        <Tagbar />
-
-        <div className="row-span-2 h-full col-span-2 border border-black max-w-full pt-[20px]">
-          {content.map((blog) => (
+        {content.map((blog) => (
+          <button
+            key={blog._id}
+            className="block row-span-1 col-span-3 h-full max-w-full pt-[20px]"
+            onClick={() => blogDeatil(blog._id)}
+          >
             <Blog
-              key={blog._id}
               name={blog.author.name}
               title={blog.title}
               content={blog.description}
               creatDate={blog.createdAt}
             />
-          ))}
-        </div>
-        <div></div>
+          </button>
+        ))}
+        =<div className="col-span-3"></div>
       </div>
       <Footter />
     </>

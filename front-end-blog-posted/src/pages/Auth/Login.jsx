@@ -32,7 +32,7 @@ export default function Login() {
       setMessage(response.data.massage);
       setEmail("");
       setPassword("");
-      navigate("/");
+      navigate("/home");
     } catch (error) {
       if (error.response && error.response.data) {
         setMessage(error.response.data.message);
