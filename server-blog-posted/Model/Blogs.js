@@ -25,6 +25,14 @@ const Blogs = Schema(
         default: null,
       },
     },
+    like: {
+      type: Number,
+      default: 0,
+    },
+    dislinke: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

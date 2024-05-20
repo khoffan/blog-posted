@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Nav from "./Nav";
+
 export default function CardDeatil({ id }) {
   const [blogDeatil, setBlogDetail] = useState({});
   //  console.log(id);
-  useEffect(() => {
-    getBlogbyId();
-  }, []);
 
   const getBlogbyId = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/blog/${id}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_API_URI}/api/blog/${id}`
+      );
       //  console.log(response.data.blog);
       setBlogDetail(response.data.blog);
+      console.log(response.status);
     } catch (error) {
       console.log(error);
     }
@@ -24,24 +25,26 @@ export default function CardDeatil({ id }) {
   return (
     <>
       <Nav />
-      <div className="block w-full h-screen border-box bg-red-200">
+      <div className="block w-screen min-h-screen border-box">
         <div className="p-10 h-full flex flex-col justify-center items-center gap-4 ">
           <div
             id="user-and-title"
-            className="p-10 bg-red-400 max-w-[600px] w-full h-[100px]"
+            className="p-10 max-w-[1000px] w-full h-[100px]"
           >
-            {blogDeatil.title}
+            <img
+              className="inline w-[8opx] rounded-full h-[80px] "
+              src={`${import.meta.env.VITE_BASE_API_URI}/${
+                blogDeatil.author.image
+              }`}
+            />
+            <p className="inline ml-4 text-bold text-xl">{blogDeatil.title}</p>
+            <p className=" inline ml-4">{blogDeatil.author.name}</p>
           </div>
           <div
             id="tag"
-            className="p-10 bg-red-400 max-w-[600px] w-full h-[100px]"
-          >
-            tag
-          </div>
-          <div
-            id="content"
-            className="p-10 bg-red-400 max-w-[600px] w-full h-[500px]"
-          >
+            className="p-10  max-w-[1000px] w-full h-[100px] hidden"
+          ></div>
+          <div id="content" className="p-10  max-w-[1000px] w-full h-[500px]">
             {blogDeatil.description}
           </div>
         </div>

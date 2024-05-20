@@ -285,7 +285,7 @@ app.post("/api/creatBlogs", veriflyAuth, async (req, res) => {
       author,
     });
     blog.save();
-    res.status(201).send({
+    return res.status(201).send({
       massage: "Blog created successfully",
       blog,
     });
@@ -324,7 +324,7 @@ app.put("/api/updateblog/:id", veriflyAuth, async (req, res) => {
 });
 
 // get all blogs
-app.get("/api/blogs", veriflyAuth, async (req, res) => {
+app.get("/api/blogs", async (req, res) => {
   try {
     const blogs = await Blogs.find();
     return res.status(200).send({

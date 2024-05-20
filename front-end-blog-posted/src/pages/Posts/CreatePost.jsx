@@ -24,7 +24,7 @@ function CreatePost() {
       const autherRes = response.data.user;
 
       setAuthor({
-        name: autherRes.firstname + " " + autherRes.last_name,
+        name: autherRes.first_name + " " + autherRes.last_name,
         email: autherRes.email,
         image: autherRes.image_path,
       });
@@ -91,17 +91,17 @@ function CreatePost() {
             <div className="mb-6">
               <label
                 className="block mb-2 text-sm font-medium text-black "
-                htmlFor="descriptions"
+                htmlFor="Contents"
               >
-                Description
+                Contents
               </label>
               <textarea
-                name="descriptions"
-                id="descriptions"
+                name="Contents"
+                id="Contents"
                 cols="30"
                 rows="10"
-                className="border rounded-md border-black p-2 w-full"
-                placeholder="description"
+                className="border rounded-md border-black p-2 w-full static"
+                placeholder="Contents"
                 onChange={handleChangeDescription}
               ></textarea>
             </div>
