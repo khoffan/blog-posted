@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Nav from "../../components/Nav";
 
 function CreatePost() {
   const { id } = useParams();
+
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -19,7 +21,7 @@ function CreatePost() {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/profile/${id}`
+        `${import.meta.env.VITE_BASE_API_URI}/api/profile/${id}`
       );
       const autherRes = response.data.user;
 
@@ -60,7 +62,12 @@ function CreatePost() {
           withCredentials: true,
         }
       );
-      console.log(response.data);
+      if (response.status === 201) {
+        alert("Blog created successfully");
+        navigate("/home");
+      } else {
+        console.log(response.status);
+      }
     } catch (error) {
       console.log(error);
     }

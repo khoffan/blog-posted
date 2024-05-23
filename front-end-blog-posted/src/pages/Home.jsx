@@ -36,22 +36,17 @@ function Home() {
     }
   };
 
-  const blogDeatil = (id) => {
-    navigate(`/blog/deatil/${id}`);
-    return false;
-  };
-
   return (
     <>
       {isLoading == true ? (
         <Loading />
       ) : (
-        <div className="h-screen pt-[20px] grid grid-row-3 grid-flow-col row-auto gab-4">
+        <div className="min-h-screen mx-auto pt-[20px] min-w-screen">
           <Sidebar />
           {content.map((blog) => (
             <button
               key={blog._id}
-              className="block col-span-2 row-span-2 h-full max-w-full pt-[20px]"
+              className="w-full h-full pt-[20px]"
               onClick={() => blogDeatil(blog._id)}
             >
               <Blog
@@ -60,6 +55,7 @@ function Home() {
                 content={blog.description}
                 creatDate={blog.createdAt}
                 imageUrl={blog.author.image}
+                isUser={false}
               />
             </button>
           ))}

@@ -70,7 +70,6 @@ function Nav() {
   const handletoblogpage = () => {
     if (isLogin) {
       navigate(`/blog/${user._id}`);
-      console.log(user.email);
     } else {
       navigate("/");
     }
