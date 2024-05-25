@@ -8,9 +8,6 @@ import axios from "axios";
 
 function Nav() {
 	const { id } = useParams();
-	const location = useLocation();
-
-	let currentPath = location.pathname;
 
 	const [sreach, setSreach] = useState("");
 	const [isLogin, setIsLogin] = useState(false);
@@ -31,7 +28,7 @@ function Nav() {
 	const handleResponse = async () => {
 		try {
 			const res = await axios.post(
-				`${import.meta.env.VITE_BASE_API_URI}/api/user/${id}`,
+				`${import.meta.env.VITE_BASE_API_URI}/api/user/`,
 				{},
 				{
 					withCredentials: true,
@@ -40,7 +37,7 @@ function Nav() {
 					}
 				}
 			);
-			console.log(res.data);
+			//console.log(res.data);
 			if (res.data.auth == true) {
 				setIsLogin(true);
 			}
@@ -50,7 +47,7 @@ function Nav() {
 			} else {
 				setIsLogin(false);
 			}
-			console.log(res.data.user.image_path);
+			//console.log(res.data.user.image_path);
 		} catch (error) {
 			if (error.response && error.response.status === 401) {
 				// Handle token expiration here, for example, by redirecting to the login page
@@ -64,7 +61,7 @@ function Nav() {
 
 	const handleProfileNvigate = () => {
 		if (isLogin) {
-			navigate(`/user/profile/${user._id}`);
+			navigate(`/user/profile/`, { state: { user } });
 			//console.log(user.email);
 		} else {
 			navigate("/login");
@@ -120,7 +117,7 @@ function Nav() {
 	return (
 		<div className="sticky z-50 top-0 w-full flex flex-row items-center justify-between p-6 bg-red-500">
 			<div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
-				<Link to={currentPath}>Litium</Link>
+				<Link to="/">Litium</Link>
 				<div className="mx-5">
 					<input
 						className="rounded-full px-5 text-l text-black input-field w-full py-1 px-2 text-lg focus:outline-none focus:shadow-outline "

@@ -18,6 +18,7 @@ const Users = require("./Model/Users");
 const Blogs = require("./Model/Blogs");
 const Profile = require("./Model/Profile");
 const veriflyAuth = require("./middleware/veriflyAuth");
+const { verify } = require("crypto");
 
 //upload file disk stroage multer
 const storage = multer.diskStorage({
@@ -177,17 +178,20 @@ app.get("/protected-route", veriflyAuth, (req, res) => {
 	}
 });
 
-app.post("/api/user/:id", veriflyAuth, async (req, res) => {
+app.post("/api/user/", veriflyAuth, async (req, res) => {
 	try {
-		const { id } = req.params;
+		const token = req.cookies.token;
+		const veriflyToken = jwt.verify(token, process.env.TOKEN_KEY);
+		const email = veriflyToken.email;
+		console.log(email);
 
-		if (id == null || id == "") {
+		if (email == null || email == "") {
 			return res.status(400).send({
 				massage: "ไม่มี email นี้ในระบบ",
 				isUser: false
 			});
 		}
-		const user = await Users.findById(id);
+		const user = await Users.findOne({ email: email });
 		if (user == null || user == "" || user == undefined) {
 			return res.status(400).send({
 				massage: "ไม่มีผู้ใช้รายนี้",
@@ -237,10 +241,9 @@ app.get("/api/profile", veriflyAuth, async (req, res) => {
 		});
 	}
 });
-app.get("/api/creatprofile", veriflyAuth, async (req, res) => {
+app.post("/api/creatprofile", veriflyAuth, async (req, res) => {
 	try {
 		const { first_name, last_name, email, phone, address, image_path, image_name } = req.body;
-		const fileSelector = req.file;
 		if ({ first_name, last_name, email, phone, address } == null) {
 			return res.status(400).send({
 				massage: "กรุณากรอกข้อมูลให้ครบถ้วน",

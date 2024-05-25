@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import DetailProfile from "../../components/DetailProfile";
 
 export default function Profile() {
-  const { id } = useParams();
-  console.log(id);
+	const location = useLocation();
+	const { user } = location.state || {};
 
-  return (
-    <>
-      <DetailProfile id={id} />
-    </>
-  );
+	return (
+		<>
+			<DetailProfile userObj={user} />
+		</>
+	);
 }
