@@ -4,6 +4,7 @@ import { styled } from "@mui/material/styles";
 import { grey } from "@mui/material/colors";
 import { Link } from "react-router-dom";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import Dropdown from "./Dropdown";
 import axios from "axios";
 
 function Nav() {
@@ -13,6 +14,7 @@ function Nav() {
 	const [isLogin, setIsLogin] = useState(false);
 	const [user, setUser] = useState({});
 	const [isImage, setIsIMage] = useState(false);
+	const [isDropdown, setIsDropdown] = useState(false);
 
 	const navigate = useNavigate();
 	const handleSreaching = (event) => {
@@ -83,6 +85,10 @@ function Nav() {
 		}
 	};
 
+	const handleDropdown = () => {
+		setIsDropdown(!isDropdown);
+	};
+
 	const handleLogout = async () => {
 		try {
 			const res = await axios.post("http://localhost:3001/api/logout", null, {
@@ -140,25 +146,33 @@ function Nav() {
 							Write Blog
 						</li>
 					</ul>
-					<button
-						className="block bg-white hover:bg-red-300 text-black font-bold py-2 px-4 rounded"
-						onClick={handleLogout}
-					>
-						Logout
-					</button>
+
 					<div className="flex flex-row justify-center items-center mx-5">
 						<p className="text-white text-lg">{user.first_name}</p>
 
-						<img
-							className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
-							src={
-								isImage
-									? `http://localhost:3001/${user.image_path}`
-									: "https://via.placeholder.com/150"
-							}
-							alt=""
-							onClick={handleProfileNvigate}
-						/>
+						<div>
+							<button
+								id="dropdownButton"
+								onClick={handleDropdown}
+								className="relative inline-block text-left"
+							>
+								<img
+									className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
+									src={
+										isImage
+											? `http://localhost:3001/${user.image_path}`
+											: "https://via.placeholder.com/150"
+									}
+									alt=""
+								/>
+							</button>
+						</div>
+						{isDropdown && (
+							<Dropdown
+								navProfile={handleProfileNvigate}
+								logoutevent={handleLogout}
+							/>
+						)}
 					</div>
 				</div>
 			) : (

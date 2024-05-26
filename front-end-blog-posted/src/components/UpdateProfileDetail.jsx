@@ -4,92 +4,124 @@ import Nav from "./Nav";
 import Footter from "./Footter";
 import { useNavigate } from "react-router-dom";
 export default function UpdateProfileDetail({ id }) {
-  const [user, setuser] = useState({});
-  const [imageurl, setImageurl] = useState("");
-  const navigate = useNavigate();
-  useEffect(() => {
-    fetchData();
-  }, []);
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3001/api/profile/${id}`
-      );
-      //  console.log(response.data);
-      setuser(response.data.user);
-      setImageurl(response.data.user.image_path);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+	const [user, setuser] = useState({
+		name: "",
+		email: "",
+		address: "",
+		image_path: "",
+		phone: "",
+		blog_count: 0
+	});
+	const [imageurl, setImageurl] = useState("");
+	const navigate = useNavigate();
 
-  const handleChangImage = async (event) => {
-    const file = event.target.files[0];
-    const formData = new FormData();
-    console.log(file);
-    formData.append("file", file);
-    try {
-      const response = await axios.put(
-        `http://localhost:3001/api/updateprofile/${id}`,
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(response.data);
-      setImageurl(response.data.image_path);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+	const handleChangImage = async (event) => {
+		const file = event.target.files[0];
+		const formData = new FormData();
+		console.log(file);
+		formData.append("file", file);
+		try {
+			const response = await axios.put(
+				`http://localhost:3001/api/updateprofile/${id}`,
+				formData,
+				{
+					withCredentials: true,
+					headers: {
+						"Content-Type": "multipart/form-data"
+					}
+				}
+			);
+			console.log(response.data);
+			setImageurl(response.data.image_path);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
-  return (
-    <>
-      <div className="max-w-screen min-h-screen bg-red-400 ">
-        <Nav />
-        <div className="max-w-[1000px] h-[600px] rounded-md mx-auto bg-white ">
-          <div className="relative left-[400px] mb-4 bg-cover bg-no-repeat bg-center">
-            <input
-              type="file"
-              id="file-input"
-              onChange={handleChangImage}
-              className="hidden" // Hides the default input
-            />
-            <label
-              htmlFor="file-input" // Links the label to the hidden file input
-              className="cursor-pointer text-xl text-blue-500 flex "
-            >
-              <img
-                className="w-[200px] h-[200px] rounded-full mb-4 object-cover"
-                src={
-                  imageurl ? `http://localhost:3001/${imageurl}` : "no image"
-                }
-                alt="profile"
-              />
-            </label>
-          </div>
-          <div className="flex flex-col justify-start items-start relative h-[300px] bg-blue-300">
-            <div className="grid grid-cols-3 gap-4 border-b-2 border-black w-full h-[400px]">
-              <div className="col-span-1 flex flex-col  text-white  block">
-                <p className="text-3xl w-[300px] bg-black text-center m-4">
-                  {user.first_name}-{user.last_name}
-                </p>
-                <p className="text-3xl w-[300px] bg-black text-center ml-4">
-                  {user.email}
-                </p>
-              </div>
-              <div className="col-span-2 border-l-2 border-black">
-                <h1 className="text-3xl m-4">list My blogs</h1>
-                <p className="text-xl text-bottom m-4">number of blogs</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <Footter />
-    </>
-  );
+	const handleSubmit = async (event) => {
+		event.preventDefault();
+		try {
+			const response = await axios.post(
+				`${import.meta.env.VITE_BASE_API_URI}/api/updateprofile/${id}`,
+				{
+					name: event.target.name.value,
+					email: event.target.email.value,
+					address: event.target.address.value,
+					image_path: imageurl
+				},
+				{
+					withCredentials: true,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				}
+			);
+			console.log(response.data);
+			navigate(`/home/${id}`);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const changeName = (event) => {
+		setuser({ ...user, name: event.target.value });
+	};
+
+	const changeEmail = (event) => {
+		setuser({ ...user, email: event.target.value });
+	};
+
+	const changeAddress = (event) => {
+		setuser({ ...user, address: event.target.value });
+	};
+
+	const changePhone = (event) => {
+		setuser({ ...user, phone: event.target.value });
+	};
+
+	return (
+		<>
+			<div className="min-w-screen min-h-screen">
+				<Nav />
+
+				<input type="file" id="file" className="hidden rounded-full w-[80] h-[80]" />
+				<label
+					htmlFor="file"
+					className="mx-auto mt-[20px] w-32 h-32 border-4 border-blue-200 border-dashed rounded-full flex items-center justify-center cursor-pointer"
+				></label>
+
+				<div
+					id="feld_data"
+					className="w-[800px] px-[20px] py-[10px] mx-auto  border border-black mt-[20px]"
+				>
+					<span className="py-[30px]  mb-[10px] pl-[40px] block text-xl border border-black">
+						Name:
+						<input
+							type="text"
+							id="name"
+							className="ml-[20px] px-[10px] rounded-md outline-none w-[300px] h-[50px] border caret-orange-400"
+							value={user.name}
+						/>
+					</span>
+					<span className="py-[30px] text-xl pl-[40px] mt-[10px] block border border-black">
+						Email:
+						<p className="text-xl inline px-[30px] "></p>
+					</span>
+					<span className="py-[30px] text-xl pl-[40px] mt-[10px] block  border border-black">
+						Address:
+						<p className="text-xl inline px-[30px] ">ไม่มีช้อมูล</p>
+					</span>
+					<span className="py-[30px] text-xl pl-[40px] mt-[10px] block  border border-black">
+						Phone:
+						<p className="text-xl inline px-[30px] ">ไม่มีข้อมูล</p>
+					</span>
+					<span className="py-[30px] text-xl pl-[40px] mt-[10px] block  border border-black">
+						Blogs count:
+						<p className="text-xl inline px-[30px] ">ไม่มีข้อมูล</p>
+					</span>
+				</div>
+				<Footter />
+			</div>
+		</>
+	);
 }

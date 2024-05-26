@@ -16,7 +16,7 @@ const connectDB = require("./DB-connect/db_connect");
 // import model
 const Users = require("./Model/Users");
 const Blogs = require("./Model/Blogs");
-const Profile = require("./Model/Profile");
+const Profiles = require("./Model/Profile");
 const veriflyAuth = require("./middleware/veriflyAuth");
 const { verify } = require("crypto");
 
@@ -183,7 +183,6 @@ app.post("/api/user/", veriflyAuth, async (req, res) => {
 		const token = req.cookies.token;
 		const veriflyToken = jwt.verify(token, process.env.TOKEN_KEY);
 		const email = veriflyToken.email;
-		console.log(email);
 
 		if (email == null || email == "") {
 			return res.status(400).send({
@@ -221,7 +220,7 @@ app.get("/api/profile", veriflyAuth, async (req, res) => {
 				isprofile: false
 			});
 		}
-		const profile = await Profile.findOne(email);
+		const profile = await Profiles.findOne(email);
 		if (profile == null || profile == "" || profile == undefined) {
 			return res.status(400).send({
 				massage: "กรุณากรอกข้อมูลให้ครบถ้วน",
@@ -243,22 +242,21 @@ app.get("/api/profile", veriflyAuth, async (req, res) => {
 });
 app.post("/api/creatprofile", veriflyAuth, async (req, res) => {
 	try {
-		const { first_name, last_name, email, phone, address, image_path, image_name } = req.body;
+		const { first_name, last_name, email, phone, address, authid } = req.body;
 		if ({ first_name, last_name, email, phone, address } == null) {
 			return res.status(400).send({
 				massage: "กรุณากรอกข้อมูลให้ครบถ้วน",
 				isprofile: false
 			});
 		}
-		const profile = new Profile({
+		const profile = new Profiles({
 			first_name,
 			last_name,
 			email,
 			phone,
 			address,
 			blog_count: 0,
-			image_path,
-			image_name
+			authid
 		});
 		profile.save();
 		return res.status(201).send({
@@ -279,7 +277,7 @@ app.post("/api/creatprofile", veriflyAuth, async (req, res) => {
 app.get("/api/profile/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
-		const profile = await Profile.findById(id);
+		const profile = await Profiles.findById(id);
 		if (profile == null || profile == undefined) {
 			return res.status(404).send({
 				massage: "profile not found",
@@ -308,21 +306,18 @@ app.put("/api/updateprofile/:id", upload.single("file"), async (req, res) => {
 				massage: "Unauthenticated"
 			});
 		}
-		const { first_name, last_name } = req.body;
 		const fileSelacter = req.file;
 		let _id = id;
 		console.log(fileSelacter);
 
 		// Check if user exists
-		const user = await Users.findById(_id);
-		if (!user) {
+		const Profile = await Profiles.findById(_id);
+		if (!Profile) {
 			return res.status(404).send({
 				massage: "User not found"
 			});
 		}
-		await Users.findByIdAndUpdate(_id, {
-			first_name,
-			last_name,
+		await Profiles.findByIdAndUpdate(_id, {
 			image_path: fileSelacter ? fileSelacter.path : null,
 			image_name: fileSelacter ? fileSelacter.originalname : null
 		});
