@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import DetailProfile from "../../components/DetailProfile";
+import DetailProfile from "../../components/profileComponents/DetailProfile";
 
 export default function Profile() {
 	const location = useLocation();

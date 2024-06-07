@@ -8,8 +8,6 @@ import Dropdown from "./Dropdown";
 import axios from "axios";
 
 function Nav() {
-	const { id } = useParams();
-
 	const [sreach, setSreach] = useState("");
 	const [isLogin, setIsLogin] = useState(false);
 	const [user, setUser] = useState({});
@@ -23,31 +21,23 @@ function Nav() {
 	};
 
 	useEffect(() => {
-		if (isLogin == false) {
-			handleResponse();
-		}
-	}, [isLogin]);
+		handleResponse();
+	}, []);
 	const handleResponse = async () => {
 		try {
-			const res = await axios.post(
-				`${import.meta.env.VITE_BASE_API_URI}/api/user/`,
-				{},
-				{
-					withCredentials: true,
-					headers: {
-						"Content-Type": "application/json"
-					}
+			const res = await axios.get(`${import.meta.env.VITE_BASE_API_URI}/api/user`, {
+				withCredentials: true,
+				headers: {
+					"Content-Type": "application/json"
 				}
-			);
-			//console.log(res.data);
+			});
+			console.log(res.data);
 			if (res.data.auth == true) {
 				setIsLogin(true);
 			}
 			setUser(res.data.user);
 			if (res.data.user.image_path) {
 				setIsIMage(true);
-			} else {
-				setIsLogin(false);
 			}
 			//console.log(res.data.user.image_path);
 		} catch (error) {
@@ -136,7 +126,7 @@ function Nav() {
 					/>
 				</div>
 			</div>
-			{isLogin ? (
+			{isLogin == true ? (
 				<div className="flex flex-row justify-center items-center ">
 					<ul className="flex flex-row justify-center space-x-4 mx-5">
 						<li className="mx-5 hover:text-white" onClick={handletoblogpage}>

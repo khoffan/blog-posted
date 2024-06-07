@@ -1,13 +1,13 @@
 import React from "react";
-import Nav from "./Nav";
-import Footter from "./Footter";
+import Nav from "../Nav";
+import Footter from "../Footter";
 import { useNavigate } from "react-router-dom";
 export default function DetailProfile({ userObj }) {
 	const navigate = useNavigate();
-
+	console.log(userObj);
 	const handleUpdateProfile = () => {
 		console.log("eiei");
-		navigate(`/user/editprofile/${userObj._id}`);
+		navigate(`/user/editprofile/${userObj._id}`, { state: { userObj } });
 	};
 
 	return (
@@ -33,12 +33,20 @@ export default function DetailProfile({ userObj }) {
 					<div className="h-full min-w-[200px] w-[800px] max-w-full border border-blcak mx-auto">
 						<div className="h-full w-full border border-black">
 							<div className="flex flex-col">
-								<img
-									src={`${import.meta.env.VITE_BASE_API_URI}/${
-										userObj.image_path
-									}`}
-									className="rounded-full  w-[80px] h-[80px] object-cover mx-auto pt-[10px] border border-black"
-								/>
+								{userObj.image_path == null ? (
+									<img
+										src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+										alt="profile"
+										className="w-[100px] h-[100px] mx-auto mt-[20px]"
+									/>
+								) : (
+									<img
+										src={`${import.meta.env.VITE_BASE_API_URI}/${
+											userObj.image_path
+										}`}
+										className="rounded-full  w-[80px] h-[80px] object-cover mx-auto pt-[10px] border border-black"
+									/>
+								)}
 								<div className="flex flex-row justify-end pr-[20px]">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"

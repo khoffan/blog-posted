@@ -23,13 +23,13 @@ const router = createBrowserRouter([
 		element: <App />
 	},
 	{
-		path: "/home/:id",
+		path: "/home",
 		element: <Home />
 	},
 	{
 		path: "/login",
 		element: (
-			<ProtechRoute redirectPath="/home/:id">
+			<ProtechRoute redirectPath="/home">
 				<Login />
 			</ProtechRoute>
 
@@ -39,7 +39,7 @@ const router = createBrowserRouter([
 	{
 		path: "/signup",
 		element: (
-			<ProtechRoute redirectPath="/home/:id">
+			<ProtechRoute redirectPath="/home">
 				<Register />
 			</ProtechRoute>
 

@@ -29,7 +29,7 @@ export default function Login() {
 			setEmail("");
 			setPassword("");
 			setTimeout(() => {
-				navigate(`/home/${response.data.user._id}`);
+				navigate(`/home`);
 			}, 500);
 		} catch (error) {
 			if (error.response && error.response.data) {
