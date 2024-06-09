@@ -51,7 +51,7 @@ router.get("/user", async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
-		return res.status(403).send({
+		return res.status(401).send({
 			massage: "Authentication failed",
 			error: error.massage
 		});
@@ -147,13 +147,45 @@ router.get("/profile/:id", async (req, res) => {
 router.put("/updateprofile/:id", veriflyAuth, async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { first_name, last_name, phone_nuumber, address, email, authid } = req.body;
-		res.status(200).send({
+		const { name, phone_nuumber, address, email } = req.body;
+		if (
+			(name, phone_nuumber, address, email) == null ||
+			(name, phone_nuumber, address, email) == ""
+		) {
+			return res.status(400).send({
+				massage: "กรุณากรอกข้อมูลให้ครบถ้วน",
+				isprofile: false
+			});
+		}
+		let first_name = name.split(" ")[0];
+		let last_name = name.split(" ")[1];
+		let _id = id;
+		console.log(first_name + " " + last_name);
+
+		const profile = await Profiles.findById(_id);
+		if (!profile) {
+			return res.status(404).send({
+				massage: "User not found"
+			});
+		}
+
+		await Profiles.findOneAndUpdate(
+			{ _id },
+			{
+				first_name,
+				last_name,
+				email,
+				phone_nuumber,
+				address
+			}
+		);
+
+		return res.status(200).send({
 			massage: "User updated successfully"
 		});
 	} catch (error) {
 		console.log(error);
-		res.status(403).send({
+		return res.status(403).send({
 			massage: "Authentication failed",
 			error
 		});
@@ -174,14 +206,14 @@ router.put("/uploadimage/:id", upload.single("file"), async (req, res) => {
 		console.log(fileSelacter);
 
 		// Check if user exists
-		const Profile = await Profiles.findOne({ authid: _id });
+		const Profile = await Profiles.findOne({ _id });
 		if (!Profile) {
 			return res.status(404).send({
 				massage: "User not found"
 			});
 		}
 		await Profiles.findOneAndUpdate(
-			{ authid: _id },
+			{ _id },
 			{
 				image_path: fileSelacter ? fileSelacter.path : null,
 				image_name: fileSelacter ? fileSelacter.originalname : null

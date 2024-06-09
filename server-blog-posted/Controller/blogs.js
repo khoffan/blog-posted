@@ -89,4 +89,51 @@ router.get("/blog/:id", async (req, res) => {
 	}
 });
 
+router.post("/blog/like/:id", async (req, res) => {
+	try {
+		const { id } = req.params;
+		const blog = await Blogs.findById(id);
+		if (blog == null) {
+			return res.status(400).send({
+				message: "Blog not found"
+			});
+		}
+		blog.like = blog.like + 1;
+		blog.save();
+		return res.status(200).send({
+			message: "like blog success",
+			blog
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(401).send({
+			massage: "like blog unsuccess",
+			error
+		});
+	}
+});
+router.post("/blog/dislike/:id", async (req, res) => {
+	try {
+		const { id } = req.params;
+		const blog = await Blogs.findById(id);
+		if (blog == null) {
+			return res.status(400).send({
+				message: "Blog not found"
+			});
+		}
+		blog.dislinke = blog.dislinke + 1;
+		blog.save();
+		return res.status(200).send({
+			message: "like blog success",
+			blog
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(401).send({
+			massage: "like blog unsuccess",
+			error
+		});
+	}
+});
+
 module.exports = router;

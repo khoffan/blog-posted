@@ -31,6 +31,7 @@ function Nav() {
 					"Content-Type": "application/json"
 				}
 			});
+
 			console.log(res.data);
 			if (res.data.auth == true) {
 				setIsLogin(true);
@@ -111,9 +112,9 @@ function Nav() {
 	}));
 
 	return (
-		<div className="sticky z-50 top-0 w-full flex flex-row items-center justify-between p-6 bg-red-500">
+		<div className="fixed z-[1000] top-0 left-0 w-full flex flex-row items-center justify-between px-6 h-[90px] bg-red-500">
 			<div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
-				<Link to="/">Litium</Link>
+				<Link to="/home">Litium</Link>
 				<div className="mx-5">
 					<input
 						className="rounded-full px-5 text-l text-black input-field w-full py-1 px-2 text-lg focus:outline-none focus:shadow-outline "
@@ -129,16 +130,24 @@ function Nav() {
 			{isLogin == true ? (
 				<div className="flex flex-row justify-center items-center ">
 					<ul className="flex flex-row justify-center space-x-4 mx-5">
-						<li className="mx-5 hover:text-white" onClick={handletoblogpage}>
+						<li
+							className="mx-5 hover:text-white outline-none cursor-pointer"
+							onClick={handletoblogpage}
+						>
 							Blogs
 						</li>
-						<li className="mx-5 hover:text-white" onClick={handletoWriteblog}>
+						<li
+							className="mx-5 hover:text-white outline-none cursor-pointer"
+							onClick={handletoWriteblog}
+						>
 							Write Blog
 						</li>
 					</ul>
 
 					<div className="flex flex-row justify-center items-center mx-5">
-						<p className="text-white text-lg">{user.first_name}</p>
+						<p className="text-white outline-none cursor-default text-lg">
+							{user.first_name}
+						</p>
 
 						<div>
 							<button

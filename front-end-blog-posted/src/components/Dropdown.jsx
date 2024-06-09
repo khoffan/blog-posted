@@ -6,7 +6,7 @@ export default function Dropdown({ navProfile, logoutevent }) {
 		<>
 			<div
 				id="dropdown"
-				className="absolute top-[70px] right-[60px] mt-2 w-48 bg-white shadow-lg rounded-md z-10"
+				className="fixed  inline right-[0px] top-[70px] mt-2 w-48 bg-white shadow-lg rounded-md z-100"
 			>
 				<ul className="py-1">
 					<li>
@@ -20,8 +20,8 @@ export default function Dropdown({ navProfile, logoutevent }) {
 
 					<li>
 						<button
-							onClick={logoutevent}
 							className="block px-4 py-2 w-full text-gray-800 hover:bg-gray-100"
+							onClick={logoutevent}
 						>
 							Logout
 						</button>

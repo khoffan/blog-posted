@@ -16,7 +16,7 @@ export default function UpdateProfileDetail({ id, oldData }) {
 		formData.append("file", file);
 		try {
 			const response = await axios.put(
-				`http://localhost:3001/api/uploadimage/${id}`,
+				`${import.meta.env.VITE_BASE_API_URI}/api/uploadimage/${id}`,
 				formData,
 				{
 					withCredentials: true,
@@ -37,30 +37,32 @@ export default function UpdateProfileDetail({ id, oldData }) {
 			<div className="min-w-screen min-h-screen">
 				<Nav />
 
-				<input
-					type="file"
-					id="file"
-					className="hidden rounded-full w-[80] h-[80]"
-					value=""
-					onChange={handleChangImage}
-				/>
-				<label
-					htmlFor="file"
-					className="mx-auto mt-[20px] w-32 h-32 rounded-full flex items-center justify-center cursor-pointer"
-				>
-					{imageurl ? (
-						<img
-							src={`${import.meta.env.VITE_BASE_API_URI}/${imageurl}`}
-							alt="profile"
-						/>
-					) : (
-						<img
-							src={`${import.meta.env.VITE_BASE_API_URI}/${oldData.image_path}`}
-							alt="profile"
-						/>
-					)}
-				</label>
-				<FeildDataProfile oldData={oldData} />
+				<div className="h-full w-full mt-[150px]">
+					<input
+						type="file"
+						id="file"
+						className="hidden rounded-full w-[80] h-[80]"
+						value=""
+						onChange={handleChangImage}
+					/>
+					<label
+						htmlFor="file"
+						className="mx-auto mt-[20px] w-32 h-32 rounded-full flex items-center justify-center cursor-pointer"
+					>
+						{imageurl ? (
+							<img
+								src={`${import.meta.env.VITE_BASE_API_URI}/${imageurl}`}
+								alt="profile"
+							/>
+						) : (
+							<img
+								src={`${import.meta.env.VITE_BASE_API_URI}/${oldData.image_path}`}
+								alt="profile"
+							/>
+						)}
+					</label>
+				</div>
+				<FeildDataProfile id={id} oldData={oldData} />
 				<Footter />
 			</div>
 		</>

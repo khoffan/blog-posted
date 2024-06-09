@@ -23,20 +23,24 @@ function Home() {
 				withCredentials: true
 			});
 			//console.log(response.data.blogs);
+			if (response.data.blog != undefined) {
+				setIsloading(false);
+			}
 			setContent(response.data.blogs);
 		} catch (error) {
 			console.log(error);
-		} finally {
-			setTimeout(() => {
-				setIsloading(false);
-			}, 500);
 		}
 	};
-
 	return (
 		<>
 			{isLoading == true ? (
-				<Loading />
+				content.length == 0 ? (
+					<p className="w-full min-h-screen flex flex-col justify-center items-center text-3xl">
+						ไม่มีข้อมูล
+					</p>
+				) : (
+					<Loading />
+				)
 			) : (
 				<div className="min-h-screen mx-auto pt-[20px] min-w-screen">
 					<Sidebar />
@@ -56,9 +60,9 @@ function Home() {
 							/>
 						</button>
 					))}
-					=<div className="col-span-2"></div>
 				</div>
 			)}
+
 			<Footter />
 		</>
 	);
