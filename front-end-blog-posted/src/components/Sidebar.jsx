@@ -1,12 +1,11 @@
 import React from "react";
-
-export default function Sidebar() {
-  return (
-    <>
-      <div className="relative row-span-3 h-full max-w-[300px]">
-        <h1 className="text-3xl text-start ml-[20px]"></h1>
-        <div className="absolute left-[50px] top-[50px]"></div>
-      </div>
-    </>
-  );
+import Tag from "./Tag";
+export default function Sidebar({ colSpan, colStart, colEnd }) {
+	return (
+		<>
+			<div className="row-end-1 row-start-4 row-span-1 col-span-1 h-full max-w-[300px] h-full border border-black">
+				<h1 className="text-3xl text-center ml-[20px] ">Blogs</h1>
+			</div>
+		</>
+	);
 }

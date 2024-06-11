@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Blogs = require("../Model/Blogs");
+const Profiles = require("../Model/Profile");
 const veriflyAuth = require("../middleware/veriflyAuth");
 
 // blogs api
@@ -16,9 +17,24 @@ router.post("/creatBlogs", veriflyAuth, async (req, res) => {
 		const blog = new Blogs({
 			title,
 			description,
-			author
+			author,
+			like: 0,
+			dislike: 0
 		});
-		blog.save();
+		await blog.save();
+		const blog_author = await Blogs.findOne({ "author.email": author.email });
+		if (!blog_author) {
+			return res.status(400).send({
+				massage: "Blog not found"
+			});
+		}
+		await Profiles.findOneAndUpdate(
+			{ email: blog_author.author.email },
+			{
+				$inc: { blogs_count: 1 }
+			}
+		);
+		//return false;
 		return res.status(201).send({
 			massage: "Blog created successfully",
 			blog
@@ -42,9 +58,12 @@ router.put("/updateblog/:id", veriflyAuth, async (req, res) => {
 		const blog = new Blogs({
 			title,
 			description,
-			author
+			author,
+			like: 0,
+			dislike: 0
 		});
-		blog.save();
+		console.log(blog.save());
+		return false;
 		res.status(201).send({
 			massage: "Blog created successfully",
 			blog
@@ -61,6 +80,11 @@ router.put("/updateblog/:id", veriflyAuth, async (req, res) => {
 router.get("/blogs", async (req, res) => {
 	try {
 		const blogs = await Blogs.find();
+		if (blogs == null) {
+			return res.status(400).send({
+				message: "Blogs not found"
+			});
+		}
 		return res.status(200).send({
 			message: "Blogs found",
 			blogs

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Nav from "./Nav";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function CreateBlog({ id }) {
 	const [title, setTitle] = useState("");
@@ -41,6 +42,15 @@ export default function CreateBlog({ id }) {
 	const handleChangeDescription = (event) => {
 		setDescription(event.target.value);
 	};
+
+	const alertCreatedBlog = () => {
+		return Swal.fire({
+			title: "สร้างบล็อคของคุณสำเร็จแล้ว",
+			icon: "success",
+			confirmButtonText: "ตกลง"
+		});
+	};
+
 	const handleSubmitBlog = async (event) => {
 		event.preventDefault();
 		try {
@@ -49,7 +59,7 @@ export default function CreateBlog({ id }) {
 				return;
 			}
 			const response = await axios.post(
-				"http://localhost:3001/api/creatBlogs",
+				`${import.meta.env.VITE_BASE_API_URI}/api/creatBlogs`,
 				{
 					title: title,
 					description: description,
@@ -63,7 +73,7 @@ export default function CreateBlog({ id }) {
 				}
 			);
 			if (response.status === 201) {
-				alert("Blog created successfully");
+				alertCreatedBlog();
 				navigate("/home");
 			} else {
 				console.log(response.status);

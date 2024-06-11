@@ -2,25 +2,27 @@ import React from "react";
 import Tag from "./Tag";
 
 export default function Tagbar() {
-  return (
-    <>
-      <div className="relative col-span-2 row-span-1 border border-black max-w-full">
-        <h1>Tag</h1>
-        <div className="absolute left-[50px] top-[20px]">
-          <ul className="grid grid-cols-10 gap-4">
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-            <li>item</li>
-          </ul>
-        </div>
-      </div>
-    </>
-  );
+	const tagName = [
+		"name1",
+		"name2",
+		"name3",
+		"name4",
+		"name5",
+		"name6",
+		"name7",
+		"name8",
+		"name9",
+		"name10"
+	];
+
+	return (
+		<>
+			<div className="inline h-[100px] col-span-1 col-start-2 row-span-1 border border-black grid grid-cols-6">
+				<span className="block text-center">Tag:</span>
+				{tagName.map((name, index) => (
+					<Tag key={index} tagName={name} />
+				))}
+			</div>
+		</>
+	);
 }
