@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Blog from "./Blog.jsx";
-import Footter from "./Footter.jsx";
+import Footter from "../Footter.jsx";
 
-import Sidebar from "./Sidebar.jsx";
-import Tagbar from "./Tagbar.jsx";
+import Sidebar from "../Sidebar.jsx";
+import Tagbar from "../Tagbar.jsx";
 import { useNavigate } from "react-router-dom";
-import Loading from "./Loading.jsx";
+import Loading from "../Loading.jsx";
 
 function Home() {
 	const [content, setContent] = useState([]);
@@ -36,17 +36,23 @@ function Home() {
 		}
 	};
 
+	const blogDeatil = (id) => {
+		navigate(`/blog/deatil/${id}`);
+		return false;
+	};
+
 	return (
 		<>
 			{isLoading == false ? (
 				<>
 					<div className="min-h-screen mx-auto my-[100px] pt-[20px] min-w-screen">
-						<div className="grid grid-rows-4 grid-flow-cols gap-4">
+						<div className="grid grid-rows-3 grid-flow-cols gap-4">
 							<Sidebar />
 							<Tagbar />
-							<div className="col-start-2 col-end-2 row-span-2 col-span-1 ">
-								{content.map((blog) => (
-									<>
+
+							{content.map((blog) => (
+								<>
+									<div className="col-start-2 col-span-4 row-span-2 inline">
 										<button
 											key={blog._id}
 											className="w-full"
@@ -61,10 +67,9 @@ function Home() {
 												isUser={false}
 											/>
 										</button>
-									</>
-								))}
-							</div>
-							<div className="h-full w-full col-span-4"></div>
+									</div>
+								</>
+							))}
 						</div>
 					</div>
 				</>

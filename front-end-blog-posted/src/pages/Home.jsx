@@ -1,6 +1,6 @@
 import React from "react";
 import Nav from "../components/Nav";
-import Content from "../components/Content";
+import Content from "../components/BlogComponents/Content";
 
 export default function Home() {
 	return (
