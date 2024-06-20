@@ -46,13 +46,13 @@ function Home() {
 			{isLoading == false ? (
 				<>
 					<div className="min-h-screen mx-auto my-[100px] pt-[20px] min-w-screen">
-						<div className="grid grid-rows-3 grid-flow-cols gap-4">
-							<Sidebar />
-							<Tagbar />
+						<div className="grid grid-rows-4 gird-cols-6 grid-flow-cols gap-4">
+							{/*<Sidebar />
+							<Tagbar />*/}
 
 							{content.map((blog) => (
 								<>
-									<div className="col-start-2 col-span-4 row-span-2 inline">
+									<div className="col-start-1 col-span-5 row-span-1 inline">
 										<button
 											key={blog._id}
 											className="w-full"
