@@ -9,34 +9,58 @@ export default function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [message, setMessage] = useState("");
+	const [isShow, setIsShow] = useState(false);
 
 	const navigate = useNavigate();
+
+	const showMassageErroe = (msg) => {
+		setIsShow(true);
+		setMessage(msg);
+		setTimeout(() => {
+			setIsShow(false);
+		}, 1500);
+	};
 
 	const handleSubmitLogin = async (event) => {
 		event.preventDefault();
 		try {
-			const response = await axios.post(
-				`${import.meta.env.VITE_BASE_API_URI}/api/login`,
-				{
-					email: email,
-					password: password
-				},
-				{
-					withCredentials: true
+			if (email == "") {
+				showMassageErroe("กรุณากรอก Email");
+			}
+			if (password == "") {
+				showMassageErroe("กรุณากรอก password");
+			}
+			if (email != "" || password != "") {
+				const response = await axios.post(
+					`${import.meta.env.VITE_BASE_API_URI}/api/login`,
+					{
+						email: email,
+						password: password
+					},
+					{
+						withCredentials: true
+					}
+				);
+				console.log(response.status);
+				if (response.status === 200) {
+					showMassageErroe(response.data.massage);
+					setEmail("");
+					setPassword("");
+					setTimeout(() => {
+						navigate(`/`);
+					}, 500);
+				} else {
+					showMassageErroe("Email หรือ Password ไม่ถูกต้อง");
 				}
-			);
-			setMessage(response.data.massage);
-			setEmail("");
-			setPassword("");
-			setTimeout(() => {
-				navigate(`/home`);
-			}, 500);
+			} else {
+				showMassageErroe("กรุณากรอกข้อมูลให้ครบถ้วน");
+			}
 		} catch (error) {
 			if (error.response && error.response.data) {
-				setMessage(error.response.data.message);
+				showMassageErroe(error.response.data.massage);
 				console.log(error); // Use the error message from the server response if available
 			} else {
-				setMessage("Failed to login. Please try again later."); // Generic error message if no specific error message is available
+				showMassageErroe("Failed to login. Please try again later."); // Generic error message if no specific error message is available
 			}
 		}
 	};
@@ -46,11 +70,7 @@ export default function Login() {
 			<div className="flex flex-col min-h-screen">
 				<div className="grid grid-cols-2 flex-grow">
 					<div className="bg-red-400 flex flex-col justify-center items-center z-10 border-r border-black">
-						<img
-							src=""
-							alt="420 * 280"
-							className="bg-black-400 p-auto border-r w-40 h-40"
-						/>
+						<img src="" className="bg-black-400 p-auto border-r w-40 h-40 hidden" />
 						<h2 className="text-9xl text-black">Litium</h2>
 						<p className="text-black text-lg">Blog Post Sing In</p>
 					</div>
@@ -85,7 +105,7 @@ export default function Login() {
 								>
 									Sing In
 								</button>
-								{message && <p>{message}</p>}
+								{isShow && <p>{message}</p>}
 							</div>
 						</div>
 					</div>

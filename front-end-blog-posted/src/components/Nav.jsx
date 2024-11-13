@@ -7,7 +7,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Dropdown from "./Dropdown";
 import axios from "axios";
 
-function Nav() {
+function Nav({ isCreateBlog }) {
 	const [sreach, setSreach] = useState("");
 	const [isLogin, setIsLogin] = useState(false);
 	const [user, setUser] = useState({});
@@ -112,98 +112,180 @@ function Nav() {
 	}));
 
 	return (
-		<div className="fixed z-[1000] top-0 left-0 w-full flex flex-row items-center justify-between px-6 h-[90px] bg-red-500">
-			<div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
-				<Link to="/home">Litium</Link>
-				<div className="mx-5">
-					<input
-						className="rounded-full px-5 text-l text-black input-field w-full py-1 px-2 text-lg focus:outline-none focus:shadow-outline "
-						id="search"
-						name="search"
-						type="text"
-						placeholder="Search..."
-						value={sreach}
-						onChange={handleSreaching}
-					/>
-				</div>
-			</div>
-			{isLogin == true ? (
-				<div className="flex flex-row justify-center items-center ">
-					<ul className="flex flex-row justify-center space-x-4 mx-5">
-						<li
-							className="mx-5 hover:text-white outline-none cursor-pointer"
-							onClick={handletoblogpage}
-						>
-							Blogs
-						</li>
-						<li
-							className="mx-5 hover:text-white outline-none cursor-pointer"
-							onClick={handletoWriteblog}
-						>
-							Write Blog
-						</li>
-					</ul>
-
-					<div className="flex flex-row justify-center items-center mx-5">
-						<p className="text-white outline-none cursor-default text-lg">
-							{user.first_name}
-						</p>
-
-						<div>
-							<button
-								id="dropdownButton"
-								onClick={handleDropdown}
-								className="relative inline-block text-left"
-							>
-								<img
-									className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
-									src={
-										isImage
-											? `http://localhost:3001/${user.image_path}`
-											: "https://via.placeholder.com/150"
-									}
-									alt=""
-								/>
-							</button>
-						</div>
-						{isDropdown && (
-							<Dropdown
-								navProfile={handleProfileNvigate}
-								logoutevent={handleLogout}
-							/>
-						)}
+		<>
+			{isCreateBlog == true ? (
+				<div className="z-[1000] top-0 left-0 w-full flex flex-row items-center justify-evenly px-6 h-[90px] bg-red-500">
+					<div className="flex gap-4">
+						<Link to="/">
+							<span className="text-3xl font-bold text-white">Litium</span>
+						</Link>
+						<span className="text-base text-gray-400 pt-[10px]">
+							Write by {user.first_name}
+						</span>
 					</div>
+
+					{isLogin == true ? (
+						<div className="flex flex-row justify-center items-center ">
+							<ul className="flex flex-row justify-center space-x-4 mx-5">
+								<li
+									className="mx-5 hover:text-white outline-none cursor-pointer"
+									onClick={handletoWriteblog}
+								>
+									Write Blog
+								</li>
+							</ul>
+
+							<div className="flex flex-row justify-center items-center mx-5">
+								<p className="text-white outline-none cursor-default text-lg">
+									{user.first_name}
+								</p>
+
+								<div>
+									<button
+										id="dropdownButton"
+										onClick={handleDropdown}
+										className="relative inline-block text-left"
+									>
+										<img
+											className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
+											src={
+												isImage
+													? `http://localhost:3001/${user.image_path}`
+													: "https://via.placeholder.com/150"
+											}
+											alt=""
+										/>
+										{isDropdown && (
+											<Dropdown
+												navProfile={handleProfileNvigate}
+												logoutevent={handleLogout}
+												yourBlog={handletoblogpage}
+											/>
+										)}
+									</button>
+								</div>
+							</div>
+						</div>
+					) : (
+						<div className="flex flex-row justify-center items-center mx-5">
+							<ul className="flex flex-row justify-center space-x-4">
+								<li>
+									<a href="#" className="text-white hover:text-gray-300">
+										Home
+									</a>
+								</li>
+								<li>
+									<a href="#" className="text-white hover:text-gray-300">
+										About
+									</a>
+								</li>
+								<li>
+									<a href="#" className="text-white hover:text-gray-300">
+										Blog
+									</a>
+								</li>
+							</ul>
+							<div className="mx-5 flex flex-row justify-center space-x-4">
+								<ModifyButtonLogin variant="contained">
+									<Link to="/login">login</Link>
+								</ModifyButtonLogin>
+								<ModifyButtonSignUp variant="contained">
+									<Link to="/signup">signup</Link>
+								</ModifyButtonSignUp>
+							</div>
+						</div>
+					)}
 				</div>
 			) : (
-				<div className="flex flex-row justify-center items-center mx-5">
-					<ul className="flex flex-row justify-center space-x-4">
-						<li>
-							<a href="#" className="text-white hover:text-gray-300">
-								Home
-							</a>
-						</li>
-						<li>
-							<a href="#" className="text-white hover:text-gray-300">
-								About
-							</a>
-						</li>
-						<li>
-							<a href="#" className="text-white hover:text-gray-300">
-								Blog
-							</a>
-						</li>
-					</ul>
-					<div className="mx-5 flex flex-row justify-center space-x-4">
-						<ModifyButtonLogin variant="contained">
-							<Link to="/login">login</Link>
-						</ModifyButtonLogin>
-						<ModifyButtonSignUp variant="contained">
-							<Link to="/signup">signup</Link>
-						</ModifyButtonSignUp>
+				<div className="z-[1000] top-0 left-0 w-full flex flex-row items-center justify-between px-6 h-[90px] bg-red-500">
+					<div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
+						<Link to="/">Litium</Link>
+						<div className="mx-5">
+							<input
+								className="rounded-full px-5 text-l text-black input-field w-full py-1 px-2 text-lg focus:outline-none focus:shadow-outline "
+								id="search"
+								name="search"
+								type="text"
+								placeholder="Search..."
+								value={sreach}
+								onChange={handleSreaching}
+							/>
+						</div>
 					</div>
+					{isLogin == true ? (
+						<div className="flex flex-row justify-center items-center ">
+							<ul className="flex flex-row justify-center space-x-4 mx-5">
+								<li
+									className="mx-5 hover:text-white outline-none cursor-pointer"
+									onClick={handletoWriteblog}
+								>
+									Write Blog
+								</li>
+							</ul>
+
+							<div className="flex flex-row justify-center items-center mx-5">
+								<p className="text-white outline-none cursor-default text-lg">
+									{user.first_name}
+								</p>
+
+								<div>
+									<button
+										id="dropdownButton"
+										onClick={handleDropdown}
+										className="relative inline-block text-left"
+									>
+										<img
+											className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
+											src={
+												isImage
+													? `http://localhost:3001/${user.image_path}`
+													: "https://via.placeholder.com/150"
+											}
+											alt=""
+										/>
+									</button>
+								</div>
+								{isDropdown && (
+									<Dropdown
+										navProfile={handleProfileNvigate}
+										logoutevent={handleLogout}
+										yourBlog={handletoblogpage}
+									/>
+								)}
+							</div>
+						</div>
+					) : (
+						<div className="flex flex-row justify-center items-center mx-5">
+							<ul className="flex flex-row justify-center space-x-4">
+								<li>
+									<a href="#" className="text-white hover:text-gray-300">
+										Home
+									</a>
+								</li>
+								<li>
+									<a href="#" className="text-white hover:text-gray-300">
+										About
+									</a>
+								</li>
+								<li>
+									<a href="#" className="text-white hover:text-gray-300">
+										Blog
+									</a>
+								</li>
+							</ul>
+							<div className="mx-5 flex flex-row justify-center space-x-4">
+								<ModifyButtonLogin variant="contained">
+									<Link to="/login">login</Link>
+								</ModifyButtonLogin>
+								<ModifyButtonSignUp variant="contained">
+									<Link to="/signup">signup</Link>
+								</ModifyButtonSignUp>
+							</div>
+						</div>
+					)}
 				</div>
 			)}
-		</div>
+		</>
 	);
 }
 

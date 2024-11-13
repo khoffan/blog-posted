@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Blog({ imageUrl, name, title, content, creatDate, isUser }) {
 	const date = new Date(creatDate);
 	const options = {
@@ -20,7 +18,7 @@ export default function Blog({ imageUrl, name, title, content, creatDate, isUser
 	return (
 		<>
 			{isUser == false ? (
-				<div className="z-10 block mx-auto max-w-[700px] h-[250px] border rounded-md p-[10px] mb-[5px] mt-[10px] shadow-md hober:outline-offset-0 hover:outline">
+				<div className="z-10 block mx-auto max-w-[1000px] h-[250px] border rounded-md p-[10px] mb-[5px] mt-[10px] shadow-md ">
 					<div className="block flex flex-row items-center mx-5">
 						<div className="mx-4 my-4">
 							<img

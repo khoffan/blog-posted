@@ -65,7 +65,6 @@ router.post("/login", async (req, res) => {
 				massage: "กรุณากรอกข้อมูลให้ครบถ้วน"
 			});
 		}
-		console.log(email, password);
 		const user = await Users.findOne({ email: email });
 		if (user && (await bcrypt.compare(password, user.password))) {
 			const token = jwt.sign({ user_id: user._id, email }, process.env.TOKEN_KEY, {
@@ -82,7 +81,7 @@ router.post("/login", async (req, res) => {
 				user
 			});
 		} else {
-			return res.status(400).send({
+			return res.status(404).send({
 				massage: "Invalid email or password"
 			});
 		}

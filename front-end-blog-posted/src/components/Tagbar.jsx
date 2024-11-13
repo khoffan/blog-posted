@@ -17,13 +17,10 @@ export default function Tagbar() {
 
 	return (
 		<>
-			<div className="col-start-2 col-span-4 items-start max-h-[100px]  inline">
-				<div className="grid grid-cols-6 col-span-1">
-					<span className="inline text-center">Tag:</span>
-					{tagName.map((name, index) => (
-						<Tag key={index} tagName={name} />
-					))}
-				</div>
+			<div className="flex flex-rows justify-center border border-2 border-red-400">
+				{tagName.map((name, index) => (
+					<Tag key={index} tagName={name} />
+				))}
 			</div>
 		</>
 	);

@@ -22,7 +22,7 @@ function Home() {
 			const response = await axios.get(`${import.meta.env.VITE_BASE_API_URI}/api/blogs`, {
 				withCredentials: true
 			});
-			//console.log(response.data.blogs);
+			console.log(response.data.blogs);
 			if (response.data.blog != undefined) {
 				setIsloading(false);
 			}
@@ -45,32 +45,29 @@ function Home() {
 		<>
 			{isLoading == false ? (
 				<>
-					<div className="min-h-screen mx-auto my-[100px] pt-[20px] min-w-screen">
-						<div className="grid grid-rows-4 gird-cols-6 grid-flow-cols gap-4">
-							{/*<Sidebar />
-							<Tagbar />*/}
-
+					<div className="flex flex-row w-[100%] gap-4 justify-items-center">
+						<div className="grow mx-[30px]">
+							<Tagbar />
 							{content.map((blog) => (
 								<>
-									<div className="col-start-1 col-span-5 row-span-1 inline">
-										<button
-											key={blog._id}
-											className="w-full"
-											onClick={() => blogDeatil(blog._id)}
-										>
-											<Blog
-												name={blog.author.name}
-												title={blog.title}
-												content={blog.description}
-												creatDate={blog.createdAt}
-												imageUrl={blog.author.image}
-												isUser={false}
-											/>
-										</button>
-									</div>
+									<button
+										key={blog._id}
+										className="w-full"
+										onClick={() => blogDeatil(blog._id)}
+									>
+										<Blog
+											name={blog.author.name}
+											title={blog.title}
+											content={blog.description}
+											creatDate={blog.createdAt}
+											imageUrl={blog.author.image}
+											isUser={false}
+										/>
+									</button>
 								</>
 							))}
 						</div>
+						<Sidebar />
 					</div>
 				</>
 			) : (
