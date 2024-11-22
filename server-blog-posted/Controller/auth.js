@@ -48,7 +48,6 @@ router.post("/register", async (req, res) => {
 			profile
 		});
 	} catch (err) {
-		console.log(err);
 		// Send error response
 		res.status(401).send({
 			message: "Invalid email or password",
@@ -72,13 +71,11 @@ router.post("/login", async (req, res) => {
 			});
 			res.cookie("token", token, {
 				maxAge: 30000000,
-				httpOnly: true,
 				secure: true,
 				sameSite: "none"
 			});
 			return res.status(200).send({
-				massage: "Login successfully",
-				user
+				massage: "Login successfully"
 			});
 		} else {
 			return res.status(404).send({
@@ -86,7 +83,6 @@ router.post("/login", async (req, res) => {
 			});
 		}
 	} catch (err) {
-		console.log(err);
 		return res.status(401).send({
 			massage: "Invalid email or password",
 			error: err
@@ -97,7 +93,6 @@ router.post("/login", async (req, res) => {
 router.post("/logout", async (req, res) => {
 	try {
 		const token = req.cookies.token;
-		console.log(token);
 		if (token) {
 			res.clearCookie("token");
 			return res.status(200).send({
@@ -108,7 +103,6 @@ router.post("/logout", async (req, res) => {
 			massage: "Unauthenticated"
 		});
 	} catch (error) {
-		console.log(error);
 		return res.status(401).send({
 			massage: "Invalid email or password",
 			error: error.massage

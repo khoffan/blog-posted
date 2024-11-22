@@ -6,7 +6,7 @@ function LiComponent({ navTraffic, name }) {
 		<li className="mb-2 border border-1 border-gray-200">
 			<button
 				className="block px-4 py-2 w-full text-gray-800 hover:bg-gray-100"
-				onClick={navTraffic}
+				onClick={() => navTraffic()}
 			>
 				{name}
 			</button>

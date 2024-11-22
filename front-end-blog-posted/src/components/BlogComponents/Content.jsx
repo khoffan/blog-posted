@@ -46,7 +46,7 @@ function Home() {
 			{isLoading == false ? (
 				<>
 					<div className="flex flex-row w-[100%] gap-4 justify-items-center">
-						<div className="grow mx-[30px]">
+						<div className="grow mx-[30px] overflow-auto">
 							<Tagbar />
 							{content.map((blog) => (
 								<>

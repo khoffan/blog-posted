@@ -22,7 +22,6 @@ const upload = multer({ storage });
 router.get("/user", async (req, res) => {
 	try {
 		const token = req.cookies.token;
-		console.log(token);
 		if (!token) {
 			return res.status(401).send({
 				massage: "Unauthenticated"
@@ -160,7 +159,6 @@ router.put("/updateprofile/:id", veriflyAuth, async (req, res) => {
 		let first_name = name.split(" ")[0];
 		let last_name = name.split(" ")[1];
 		let _id = id;
-		console.log(first_name + " " + last_name);
 
 		const profile = await Profiles.findById(_id);
 		if (!profile) {
@@ -203,7 +201,6 @@ router.put("/uploadimage/:id", upload.single("file"), async (req, res) => {
 		}
 		const fileSelacter = req.file;
 		let _id = id;
-		console.log(fileSelacter);
 
 		// Check if user exists
 		const Profile = await Profiles.findOne({ _id });

@@ -2,16 +2,35 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Nav from "../Nav";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage, faCirclePlus, faCirclePlay } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
+function IconAwesome({ iconName }) {
+	return <FontAwesomeIcon className="text-xl" icon={iconName} />;
+}
+
+function TextNavigate() {
+	return (
+		<>
+			<ul className="flex gap-4 p-2 h-[60px] w-full">
+				<button type="button" className="inline w-[40px] h-[40px] mr-2">
+					<IconAwesome iconName={faImage} />
+				</button>
+				<button type="button" className="inline w-[40px] h-[40px] mr-2">
+					<IconAwesome iconName={faCirclePlay} />
+				</button>
+			</ul>
+		</>
+	);
+}
+
 export default function CreateBlog({ id }) {
-	const [paragraphs, setParagraphs] = useState([]);
+	const [paragraphs, setParagraphs] = useState(["", ""]);
 	const [activeIndex, setActiveIndex] = useState(null);
+	const [isTextnavigate, setIstextNavigate] = useState(Array(paragraphs.length).fill(false));
 	const [isCreateBlog, setIscreateBlog] = useState(false);
 	const paragraphRef = useRef([]);
-	const titleRef = useRef(null);
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
 	const [image, setImage] = useState("");
 	const [author, setAuthor] = useState({
 		name: "",
@@ -21,10 +40,15 @@ export default function CreateBlog({ id }) {
 
 	const navigate = useNavigate();
 
+	let result = "";
+
 	useEffect(() => {
-		if (paragraphs.length === 0) {
-			setParagraphs(["", ""]);
+		if (isTextnavigate.length != paragraphs.length) {
+			setIstextNavigate(Array(paragraphs.length).fill(false));
 		}
+	}, [paragraphs]);
+
+	useEffect(() => {
 		fetchProfile();
 		setIscreateBlog(true);
 	}, []);
@@ -51,21 +75,23 @@ export default function CreateBlog({ id }) {
 			event.preventDefault();
 
 			const newParagraphs = [...paragraphs];
-			newParagraphs.push(""); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
+			newParagraphs.splice(index + 1, 0, ""); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
 			setParagraphs(newParagraphs);
-
-			setTimeout(() => {
-				if (paragraphRef.current[newParagraphs.length - 1]) {
-					paragraphRef.current[newParagraphs.length - 1].focus();
-				}
-			}, 0);
+			setActiveIndex(index + 1);
+			//setTimeout(() => {
+			//	if (paragraphRef.current[newParagraphs.length - 1]) {
+			//		paragraphRef.current[newParagraphs.length - 1].focus();
+			//	}
+			//}, 0);
 		}
 		if (event.key === "Backspace" && paragraphs[index] === "") {
 			if (paragraphs.length > 1) {
 				const newParagraphs = [...paragraphs];
 				newParagraphs.splice(index, 1); // ลบ textarea ที่ตำแหน่งนี้
 				setParagraphs(newParagraphs);
-
+				if (index > 0) {
+					setActiveIndex(index - 1);
+				}
 				setTimeout(() => {
 					paragraphRef.current[index - 1]?.focus();
 				}, 0);
@@ -77,20 +103,20 @@ export default function CreateBlog({ id }) {
 		const newparagraphs = [...paragraphs];
 		newparagraphs[index] = event.target.value;
 		setParagraphs(newparagraphs);
-		console.log(newparagraphs);
-	};
-
-	const handleChangtitle = (event) => {
-		const newTitle = event.target.value;
-		setTitle(newTitle);
-		console.log(typeof newTitle);
 	};
 	//const handleChangeDescription = (event) => {
 	//	setDescription(event.target.value);
 	//};
 	const handleFocus = (index) => {
 		setActiveIndex(index);
+		setIstextNavigate((prevSate) => prevSate.map((state, i) => (i === index ? false : null)));
 		// เมื่อมีการโฟกัสที่ <p> จะตรวจสอบตำแหน่งของ cursor
+	};
+
+	const handleNavatebutton = (index) => {
+		setIstextNavigate((prevState) =>
+			prevState.map((state, i) => (i === index ? !state : state))
+		);
 	};
 
 	const alertCreatedBlog = () => {
@@ -132,60 +158,70 @@ export default function CreateBlog({ id }) {
 	//		console.log(error);
 	//	}
 	//};
+	const convertList2string = () => {
+		result = paragraphs.join("\n");
+		console.log(`raw reslut ${JSON.stringify(result)} typeof ${typeof result}`);
+		let split = result.split("\n");
+		console.log(`split string ${split} typeof ${typeof split}`);
+	};
 
-	//const resetCursorPosition = () => {
-	//	const selection = document.getSelection();
-	//	const range = document.createRange();
-	//	const paragraph = titleRef.current;
-
-	//	// ให้โฟกัสไปที่ paragraph
-	//	paragraph.focus();
-
-	//	// ตั้งตำแหน่ง cursor ที่จุดที่ต้องการ
-	//	const textNode = paragraph.firstChild;
-	//	range.setStart(textNode, title.length);
-	//	range.setEnd(textNode, title.length);
-	//	selection.removeAllRanges();
-	//	selection.addRange(range);
-	//};
-	console.log(paragraphs.length);
+	console.log(paragraphs);
+	console.log(isTextnavigate);
+	console.log(activeIndex);
 	return (
 		<>
-			<div className="w-full flex flex-col gap-4 ">
+			<div className="w-full flex flex-col items-center justify-center gap-4 ">
 				<Nav isCreateBlog={isCreateBlog} />
-
-				{paragraphs.map((paragraph, index) => (
-					<div key={index} className="flex flex-col items-center justify-start w-[75%]">
-						<div className="flex gap-4 relative">
-							{activeIndex === index && (
-								<button className="absolute left-[-50px] mb-2 p-2 bg-blue-500 text-white">
-									Save
-								</button>
-							)}
-							{index === 0 ? (
-								<textarea
-									ref={(el) => (paragraphRef.current[index] = el)}
-									className="w-1/2 min-h-[20px] p-[8px] mb-[8px] text-base outline-none resize-none"
-									onChange={(event) => handleContent(event, index)}
-									onKeyDown={(event) => handleKeydown(event, index)}
-									onFocus={() => handleFocus(index)}
-									placeholder="Title"
-									value={paragraph}
-								></textarea>
-							) : (
-								<textarea
-									ref={(el) => (paragraphRef.current[index] = el)}
-									className="w-1/2 min-h-[20px] p-[8px] mb-[8px] text-base outline-none resize-none"
-									onChange={(event) => handleContent(event, index)}
-									onKeyDown={(event) => handleKeydown(event, index)}
-									onFocus={() => handleFocus(index)}
-									placeholder="Content...."
-									value={paragraph}
-								></textarea>
-							)}
-						</div>
-					</div>
-				))}
+				<div className="flex flex-col justify-start w-1/2">
+					{paragraphs.map((paragraph, index) => (
+						<>
+							<div key={index} className="flex gap-4 relative">
+								{activeIndex === index && (
+									<button
+										className="absolute left-[-50px] pt-[16px] outline-none"
+										onClick={() => handleNavatebutton(index)}
+									>
+										<IconAwesome iconName={faCirclePlus} />
+									</button>
+								)}
+								{index === 0 ? (
+									<>
+										{!isTextnavigate[index] ? (
+											<textarea
+												ref={(el) => (paragraphRef.current[index] = el)}
+												className="absolute left-[0px] min-w-[200px] min-h-[20px] text-xl pt-[4px] my-[8px] text-base outline-none resize-none"
+												onChange={(event) => handleContent(event, index)}
+												onKeyDown={(event) => handleKeydown(event, index)}
+												onFocus={() => handleFocus(index)}
+												placeholder="Title"
+												value={paragraph}
+											></textarea>
+										) : (
+											<TextNavigate />
+										)}
+									</>
+								) : (
+									<>
+										{!isTextnavigate[index] ? (
+											<textarea
+												ref={(el) => (paragraphRef.current[index] = el)}
+												className="absolute left-[0px] min-w-[200px] min-h-[20px] my-[8px] pt-[4px] text-base outline-none resize-none"
+												onChange={(event) => handleContent(event, index)}
+												onKeyDown={(event) => handleKeydown(event, index)}
+												onFocus={() => handleFocus(index)}
+												placeholder="Content"
+												value={paragraph}
+											></textarea>
+										) : (
+											<TextNavigate />
+										)}
+									</>
+								)}
+							</div>
+						</>
+					))}
+				</div>
+				<button onClick={convertList2string}>Click me</button>
 			</div>
 		</>
 	);

@@ -17,7 +17,7 @@ export default function Tagbar() {
 
 	return (
 		<>
-			<div className="flex flex-rows justify-center border border-2 border-red-400">
+			<div className="flex flex-rows justify-center">
 				{tagName.map((name, index) => (
 					<Tag key={index} tagName={name} />
 				))}

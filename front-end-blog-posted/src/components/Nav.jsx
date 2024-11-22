@@ -169,28 +169,14 @@ function Nav({ isCreateBlog }) {
 					) : (
 						<div className="flex flex-row justify-center items-center mx-5">
 							<ul className="flex flex-row justify-center space-x-4">
-								<li>
-									<a href="#" className="text-white hover:text-gray-300">
-										Home
-									</a>
-								</li>
-								<li>
-									<a href="#" className="text-white hover:text-gray-300">
-										About
-									</a>
-								</li>
-								<li>
-									<a href="#" className="text-white hover:text-gray-300">
-										Blog
-									</a>
-								</li>
+								<li>Write</li>
 							</ul>
 							<div className="mx-5 flex flex-row justify-center space-x-4">
 								<ModifyButtonLogin variant="contained">
-									<Link to="/login">login</Link>
+									<Link to="/login">Sign In</Link>
 								</ModifyButtonLogin>
 								<ModifyButtonSignUp variant="contained">
-									<Link to="/signup">signup</Link>
+									<Link to="/signup">Sign Up</Link>
 								</ModifyButtonSignUp>
 							</div>
 						</div>
@@ -257,21 +243,7 @@ function Nav({ isCreateBlog }) {
 					) : (
 						<div className="flex flex-row justify-center items-center mx-5">
 							<ul className="flex flex-row justify-center space-x-4">
-								<li>
-									<a href="#" className="text-white hover:text-gray-300">
-										Home
-									</a>
-								</li>
-								<li>
-									<a href="#" className="text-white hover:text-gray-300">
-										About
-									</a>
-								</li>
-								<li>
-									<a href="#" className="text-white hover:text-gray-300">
-										Blog
-									</a>
-								</li>
+								<li>Write</li>
 							</ul>
 							<div className="mx-5 flex flex-row justify-center space-x-4">
 								<ModifyButtonLogin variant="contained">
