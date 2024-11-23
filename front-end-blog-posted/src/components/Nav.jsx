@@ -5,6 +5,8 @@ import { grey } from "@mui/material/colors";
 import { Link } from "react-router-dom";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import Dropdown from "./Dropdown";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
 function Nav({ isCreateBlog }) {
@@ -127,12 +129,9 @@ function Nav({ isCreateBlog }) {
 					{isLogin == true ? (
 						<div className="flex flex-row justify-center items-center ">
 							<ul className="flex flex-row justify-center space-x-4 mx-5">
-								<li
-									className="mx-5 hover:text-white outline-none cursor-pointer"
-									onClick={handletoWriteblog}
-								>
-									Write Blog
-								</li>
+								<button className="text-white text-center rounded-full w-[100px] p-2 mx-5 transition ease-in-out hover:-translate-y-1 hover:duration-500 hover:bg-blue-700 cursor-pointer">
+									Public
+								</button>
 							</ul>
 
 							<div className="flex flex-row justify-center items-center mx-5">
@@ -205,7 +204,7 @@ function Nav({ isCreateBlog }) {
 									className="mx-5 hover:text-white outline-none cursor-pointer"
 									onClick={handletoWriteblog}
 								>
-									Write Blog
+									Write Blog <FontAwesomeIcon icon={faPenToSquare} />
 								</li>
 							</ul>
 

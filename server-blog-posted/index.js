@@ -12,6 +12,7 @@ const connectDB = require("./DB-connect/db_connect");
 const AuthPath = require("./Controller/auth");
 const ProfilePath = require("./Controller/users");
 const BlogPath = require("./Controller/blogs");
+const CommentsPath = require("./Controller/comments");
 //upload file disk stroage multer
 
 // connect to mongodb
@@ -33,6 +34,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api", AuthPath);
 app.use("/api", ProfilePath);
 app.use("/api", BlogPath);
+app.use("/api", CommentsPath);
 
 // support json encoded bodies
 
