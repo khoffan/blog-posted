@@ -12,12 +12,16 @@ export default function Tagbar() {
 		"name7",
 		"name8",
 		"name9",
+		"name10",
+		"name10",
+		"name10",
 		"name10"
 	];
 
 	return (
 		<>
-			<div className="flex flex-rows justify-center">
+			<div className="p-4 flex flex-wrap w-[1000px] gap-2 justify-start items-center">
+				<span className="text-xl text-center font-bold">Tag:</span>
 				{tagName.map((name, index) => (
 					<Tag key={index} tagName={name} />
 				))}

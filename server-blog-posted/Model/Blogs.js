@@ -40,6 +40,14 @@ const Blogs = Schema(
 		comments: {
 			type: [{ user: String, comment: String }],
 			default: null
+		},
+		image_name: {
+			type: String,
+			default: null
+		},
+		image_path: {
+			type: String,
+			default: null
 		}
 	},
 	{

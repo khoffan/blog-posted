@@ -8,7 +8,7 @@ const veriflyAuth = require("../middleware/veriflyAuth");
 // blogs api
 router.post("/creatBlogs", veriflyAuth, async (req, res) => {
 	try {
-		const { title, description, author } = req.body;
+		const { title, description, author, tags } = req.body;
 		if (!(title && description && author)) {
 			return res.status(400).send({
 				massage: "All input is required"
@@ -18,8 +18,7 @@ router.post("/creatBlogs", veriflyAuth, async (req, res) => {
 			title,
 			description,
 			author,
-			like: 0,
-			dislike: 0
+			tag: tags
 		});
 		await blog.save();
 		const blog_author = await Blogs.findOne({ "author.email": author.email });
@@ -58,13 +57,11 @@ router.put("/updateblog/:id", veriflyAuth, async (req, res) => {
 		const blog = new Blogs({
 			title,
 			description,
-			author,
-			like: 0,
-			dislike: 0
+			author
 		});
-		console.log(blog.save());
-		return false;
-		res.status(201).send({
+		blog.save();
+		//return false;
+		return res.status(201).send({
 			massage: "Blog created successfully",
 			blog
 		});
@@ -113,7 +110,7 @@ router.get("/blog/:id", async (req, res) => {
 	}
 });
 
-router.post("/blog/like/:id", async (req, res) => {
+router.put("/blog/like/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
 		const blog = await Blogs.findById(id);
@@ -136,7 +133,7 @@ router.post("/blog/like/:id", async (req, res) => {
 		});
 	}
 });
-router.post("/blog/dislike/:id", async (req, res) => {
+router.put("/blog/dislike/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
 		const blog = await Blogs.findById(id);
@@ -155,6 +152,39 @@ router.post("/blog/dislike/:id", async (req, res) => {
 		console.log(error);
 		return res.status(401).send({
 			massage: "like blog unsuccess",
+			error
+		});
+	}
+});
+
+//add tag
+router.put("/tags/:id", async (req, res) => {
+	try {
+		const tag = req.body;
+		if (!tag) {
+			return res.status(400).send({
+				message: "ไม่มีข้อมูลที่จะอัพเดต"
+			});
+		}
+		const updatedBlog = await Blogs.findByIdAndUpdate(
+			blogId,
+			{ $set: { tag: tag } }, // อัปเดต field "tag"
+			{ new: true, runValidators: true } // ส่งคืนค่าที่อัปเดตแล้ว
+		);
+
+		if (!updatedBlog) {
+			return res.status(404).send({
+				message: "ไม่พบ Blog ที่ต้องการอัพเดต"
+			});
+		}
+		return res.status(200).send({
+			message: "อัพเดตข้อมูลสำเร็จ",
+			data: updatedBlog
+		});
+	} catch (error) {
+		console.log(error);
+		return res.status(400).send({
+			message: "ไม่มีข้อมูลที่จะอัพเดต",
 			error
 		});
 	}

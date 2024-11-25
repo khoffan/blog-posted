@@ -3,7 +3,7 @@ import axios from "axios";
 import Nav from "../Nav";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage, faCirclePlus, faCirclePlay } from "@fortawesome/free-solid-svg-icons";
+import { faImage, faCirclePlus, faCirclePlay, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
 function IconAwesome({ iconName }) {
@@ -37,6 +37,10 @@ export default function CreateBlog({ id }) {
 	const [isTextnavigate, setIstextNavigate] = useState(Array(paragraphs.length).fill(false));
 	const [isCreateBlog, setIscreateBlog] = useState(false);
 	const paragraphRef = useRef([]);
+	const [title, setTitle] = useState("");
+	const [contents, setContents] = useState("");
+	const [tags, setTags] = useState([]);
+	const [inputTag, setInputTag] = useState("");
 	const [image, setImage] = useState("");
 	const [author, setAuthor] = useState({
 		name: "",
@@ -58,7 +62,7 @@ export default function CreateBlog({ id }) {
 	useEffect(() => {
 		try {
 			const saveParagraphs = JSON.parse(localStorage.getItem("paragraphs"));
-			if (saveParagraphs.length > 0) {
+			if (saveParagraphs != null && saveParagraphs.length > 0) {
 				setParagraphs(saveParagraphs);
 			} else {
 				setParagraphs(["", ""]);
@@ -154,48 +158,84 @@ export default function CreateBlog({ id }) {
 		});
 	};
 
-	//const handleSubmitBlog = async (event) => {
-	//	event.preventDefault();
-	//	try {
-	//		if (title === "" || description === "" || author === null) {
-	//			alert("Please fill all the fields");
-	//			return;
-	//		}
-	//		const response = await axios.post(
-	//			`${import.meta.env.VITE_BASE_API_URI}/api/creatBlogs`,
-	//			{
-	//				title: title,
-	//				description: description,
-	//				author
-	//			},
-	//			{
-	//				headers: {
-	//					"Content-Type": "application/json"
-	//				},
-	//				withCredentials: true
-	//			}
-	//		);
-	//		if (response.status === 201) {
-	//			alertCreatedBlog();
-	//			navigate("/home");
-	//		} else {
-	//			console.log(response.status);
-	//		}
-	//	} catch (error) {
-	//		console.log(error);
-	//	}
-	//};
-	const convertList2string = () => {
-		result = paragraphs.join("\n");
-		console.log(`raw reslut ${JSON.stringify(result)} typeof ${typeof result}`);
-		let split = result.split("\n");
-		console.log(`split string ${split} typeof ${typeof split}`);
+	const handleInputChange = (e) => {
+		setInputTag(e.target.value);
 	};
+
+	const handleTagInputKey = (e) => {
+		if (e.key === "Enter") {
+			setInputTag("");
+			const triminput = inputTag.trim();
+
+			if (triminput && !tags.includes(triminput)) {
+				setTags([...tags, triminput]);
+			} else if (!tags.includes(triminput)) {
+				alert("tag นี้มีอยู่ในรายการแล้ว");
+			} else {
+				alert("กรุณาเพิ่ม tag");
+			}
+		}
+	};
+
+	const handleSubmitBlog = async (event) => {
+		event.preventDefault();
+		if (paragraphs.length > 2) {
+			let header = paragraphs[0];
+			result = paragraphs.slice(1).join("\n");
+			setTitle(header);
+			setContents(result);
+		}
+		try {
+			if (title === "" || contents === "" || author === null) {
+				alert("Please fill all the fields");
+				return;
+			}
+			const response = await axios.post(
+				`${import.meta.env.VITE_BASE_API_URI}/api/creatBlogs`,
+				{
+					title: title,
+					description: contents,
+					author
+				},
+				{
+					headers: {
+						"Content-Type": "application/json"
+					},
+					withCredentials: true
+				}
+			);
+			if (response.status === 201) {
+				localStorage.removeItem("paragraphs");
+				setTitle("");
+				setContents("");
+				setParagraphs([]);
+				alertCreatedBlog();
+				navigate("/");
+			} else {
+				alert("ไม่สามารถ publish blog ได้");
+			}
+		} catch (error) {
+			alert("ไม่สามารถ publish blog ได้");
+			console.log(error);
+		}
+	};
+	//const convertList2string = () => {
+	//	if (paragraphs.length > 2) {
+	//		let header = paragraphs[0];
+	//		result = paragraphs.slice(1).join("\n");
+	//		setTitle(header);
+	//		setContents(JSON.stringify(result));
+	//	}
+	//	//console.log(`raw reslut ${JSON.stringify(result)} typeof ${typeof result}`);
+	//	//let content = result.split("")
+	//	//setTitle(title)
+	//	//console.log(`split string ${split} typeof ${typeof split}`);
+	//};
 
 	return (
 		<>
 			<div className="w-full flex flex-col items-center justify-center gap-4 ">
-				<Nav isCreateBlog={isCreateBlog} />
+				<Nav isCreateBlog={isCreateBlog} publicState={handleSubmitBlog} />
 				<div className="flex flex-col justify-start w-1/2">
 					{paragraphs.map((paragraph, index) => (
 						<>
@@ -226,10 +266,37 @@ export default function CreateBlog({ id }) {
 					))}
 				</div>
 				{/* เพิ่มของ blog */}
-				<div className="border border-2 border-red-500 w-1/2"></div>
-				<button className="block" onClick={() => convertList2string()}>
-					Click Me
-				</button>
+				<div className="border border-2 border-red-500 w-1/2 p-[10px]">
+					<p className="text-xl font-bold mb-2">Tag</p>
+					<div className="flex gap-5">
+						{tags.map((tag, index) => {
+							return (
+								<div
+									className="flex flex-wrap w-20 justify-between items-center bg-green-500 text-white py-2 px-4 rounded-md border border-green-700 text-sm cursor-pointer transition-all duration-300 transform hover:bg-green-600 hover:scale-105 active:bg-green-800"
+									key={index}
+								>
+									<span className="">{tag}</span>
+									<a className="block cursor-pointer hover:text-red-400 ">
+										<IconAwesome iconName={faXmark} />
+									</a>
+								</div>
+							);
+						})}
+					</div>
+					<input
+						type="text"
+						name="tag-input"
+						id="tag-input"
+						placeholder="Add Tag"
+						value={inputTag}
+						onChange={(e) => handleInputChange(e)}
+						onKeyDown={(e) => handleTagInputKey(e)}
+						className="block m-[10px] p-[10px] rounded-md focus:outline-1 focus:outline-gray-300"
+					/>
+				</div>
+				{/*<button className="block" onClick={(e) => handleSubmitBlog(e)}>
+					
+				</button>*/}
 			</div>
 		</>
 	);

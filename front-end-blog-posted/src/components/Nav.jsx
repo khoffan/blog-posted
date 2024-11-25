@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
-function Nav({ isCreateBlog }) {
+function Nav({ isCreateBlog, publicState }) {
 	const [sreach, setSreach] = useState("");
 	const [isLogin, setIsLogin] = useState(false);
 	const [user, setUser] = useState({});
@@ -78,6 +78,12 @@ function Nav({ isCreateBlog }) {
 		}
 	};
 
+	const handleCheckLogin = () => {
+		if (!isLogin) {
+			navigate("/login");
+		}
+	};
+
 	const handleDropdown = () => {
 		setIsDropdown(!isDropdown);
 	};
@@ -129,7 +135,10 @@ function Nav({ isCreateBlog }) {
 					{isLogin == true ? (
 						<div className="flex flex-row justify-center items-center ">
 							<ul className="flex flex-row justify-center space-x-4 mx-5">
-								<button className="text-white text-center rounded-full w-[100px] p-2 mx-5 transition ease-in-out hover:-translate-y-1 hover:duration-500 hover:bg-blue-700 cursor-pointer">
+								<button
+									className="text-white text-center rounded-full w-[100px] p-2 mx-5 transition ease-in-out hover:-translate-y-1 hover:duration-500 hover:bg-blue-700 cursor-pointer"
+									onClick={(e) => publicState(e)}
+								>
 									Public
 								</button>
 							</ul>
@@ -168,7 +177,9 @@ function Nav({ isCreateBlog }) {
 					) : (
 						<div className="flex flex-row justify-center items-center mx-5">
 							<ul className="flex flex-row justify-center space-x-4">
-								<li>Write</li>
+								<li className="cursor-pointer text-lg p-2 hover:text-white">
+									Write
+								</li>
 							</ul>
 							<div className="mx-5 flex flex-row justify-center space-x-4">
 								<ModifyButtonLogin variant="contained">
@@ -242,7 +253,12 @@ function Nav({ isCreateBlog }) {
 					) : (
 						<div className="flex flex-row justify-center items-center mx-5">
 							<ul className="flex flex-row justify-center space-x-4">
-								<li>Write</li>
+								<li
+									className="cursor-pointer text-lg p-2 transition-all duration-500 transfrom hover:text-white"
+									onClick={handleCheckLogin}
+								>
+									Write Your Story
+								</li>
 							</ul>
 							<div className="mx-5 flex flex-row justify-center space-x-4">
 								<ModifyButtonLogin variant="contained">
