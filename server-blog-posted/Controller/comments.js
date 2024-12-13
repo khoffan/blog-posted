@@ -3,7 +3,6 @@ const router = express();
 
 const Comments = require("../Model/Comments");
 const veriflyAuth = require("../middleware/veriflyAuth");
-const VerifyAuth = require("../middleware/veriflyAuth");
 
 router.post("/comment", veriflyAuth, async (req, res) => {
 	try {

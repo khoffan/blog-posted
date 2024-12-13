@@ -13,6 +13,7 @@ const AuthPath = require("./Controller/auth");
 const ProfilePath = require("./Controller/users");
 const BlogPath = require("./Controller/blogs");
 const CommentsPath = require("./Controller/comments");
+const TagsController = require("./Controller/tags");
 //upload file disk stroage multer
 
 // connect to mongodb
@@ -21,12 +22,14 @@ connectDB();
 app.use(CookiesParser());
 app.use(bodyParser.json());
 app.use(
-	cors({
-		origin: "http://localhost:5173",
-		credentials: true
-	})
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+    })
 );
-app.use(session({ secret: "keyboard cat", resave: false, saveUninitialized: false }));
+app.use(
+    session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -35,18 +38,19 @@ app.use("/api", AuthPath);
 app.use("/api", ProfilePath);
 app.use("/api", BlogPath);
 app.use("/api", CommentsPath);
+app.use("/api", TagsController);
 
 // support json encoded bodies
 
 app.get("/", (req, res) => {
-	res.send({
-		massage: "Hello World"
-	});
-	console.log("Hello World");
+    res.send({
+        massage: "Hello World",
+    });
+    console.log("Hello World");
 });
 
 //listen server
 const port = process.env.POST || 3001;
 app.listen(port, () => {
-	console.log(`Example app listening ${port}`);
+    console.log(`Example app listening ${port}`);
 });

@@ -20,7 +20,7 @@ export default function Tagbar() {
 
 	return (
 		<>
-			<div className="p-4 flex flex-wrap w-[1000px] gap-2 justify-start items-center">
+			<div className="p-4 flex flex-wrap w-full gap-2 justify-start items-center">
 				<span className="text-xl text-center font-bold">Tag:</span>
 				{tagName.map((name, index) => (
 					<Tag key={index} tagName={name} />

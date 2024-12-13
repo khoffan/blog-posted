@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 import axios from "axios";
 
 export default function ProtechRoute({ redirectPath = "/", children }) {
@@ -7,27 +8,23 @@ export default function ProtechRoute({ redirectPath = "/", children }) {
 
 	const currentPath = location.pathname;
 
-	const [isProtect, setIsprotect] = useState(false);
-	const protectedRoute = async () => {
-		try {
-			const res = await axios.get("http://localhost:3001/protected-route", {
-				withCredentials: true
-			});
-			if (res.data.protect == true) {
-				setIsprotect(true);
-			} else {
-				setIsprotect(false);
-			}
-		} catch (error) {
-			console.log(error);
+	const [isProtect, setIsprotect] = useState(null);
+
+	const checkToken = () => {
+		const token = Cookies.get("token");
+		console.log("token", typeof token);
+		if (token == null) {
+			setIsprotect(false);
+		} else {
+			setIsprotect(true);
 		}
 	};
 
 	useEffect(() => {
-		protectedRoute();
-	}, []);
+		checkToken();
+	});
 
-	if (isProtect == false && currentPath == "/home/:id") {
+	if (isProtect) {
 		return <Navigate to={redirectPath} />;
 	}
 

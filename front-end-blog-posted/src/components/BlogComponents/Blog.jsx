@@ -1,4 +1,4 @@
-export default function Blog({ imageUrl, name, title, content, creatDate, isUser }) {
+export default function Blog({ index, imageUrl, name, title, content, creatDate, isUser }) {
 	const date = new Date(creatDate);
 	const options = {
 		year: "numeric",
@@ -18,7 +18,10 @@ export default function Blog({ imageUrl, name, title, content, creatDate, isUser
 	return (
 		<>
 			{isUser == false ? (
-				<div className="z-10 block mx-auto max-w-[1000px] h-[250px] border rounded-md p-[10px] mb-[5px] mt-[10px] shadow-md ">
+				<div
+					key={index}
+					className="z-10 block mx-auto max-w-[1000px] h-[250px] border rounded-md p-[10px] mb-[5px] mt-[10px] shadow-md "
+				>
 					<div className="block flex flex-row items-center mx-5">
 						<div className="mx-4 my-4">
 							<img
@@ -40,7 +43,10 @@ export default function Blog({ imageUrl, name, title, content, creatDate, isUser
 					</div>
 				</div>
 			) : (
-				<div className="z-10 relative block mx-auto max-w-[700px] min-h-[250px] border rounded-md p-[10px] mb-[10px] mt-[150px] shadow-md hover:outline-offset-0 hover:outline">
+				<div
+					key={index}
+					className="z-10 relative block mx-auto max-w-[700px] min-h-[250px] border rounded-md p-[10px] mb-[10px] mt-[150px] shadow-md hover:outline-offset-0 hover:outline"
+				>
 					<div className="block flex flex-row justify-between items-center mx-5">
 						<div className="inline mx-4 my-4">
 							<img

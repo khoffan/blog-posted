@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Nav from "../Nav";
+import Nav from "../NavbarComponents/Nav";
 
 export default function CardDeatil({ id }) {
 	const [blogDeatil, setBlogDetail] = useState({});
