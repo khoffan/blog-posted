@@ -117,7 +117,7 @@ router.post("/creatprofile", veriflyAuth, async (req, res) => {
 router.get("/profile/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const profile = await Profiles.findById(id);
+        const profile = await Profiles.findOne({ authid: id });
         if (profile == null || profile == undefined) {
             return res.status(404).send({
                 massage: "profile not found",

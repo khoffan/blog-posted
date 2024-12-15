@@ -5,8 +5,12 @@ import { useNavigate } from "react-router-dom";
 import TagFeold from "./TagFeold";
 import ParagraphFeild from "./ParagraphFeild";
 import { Alert } from "../Alert";
+import { PropTypes } from "prop-types";
 
 export default function CreateBlog({ id }) {
+    CreateBlog.propTypes = {
+        id: PropTypes.string.isRequired,
+    };
     const [paragraphs, setParagraphs] = useState([]);
     const [activeIndex, setActiveIndex] = useState(null);
     const [isTextnavigate, setIstextNavigate] = useState(
@@ -18,7 +22,6 @@ export default function CreateBlog({ id }) {
     const [contents, setContents] = useState("");
     const [tags, setTags] = useState([]);
     const [inputTag, setInputTag] = useState("");
-    const [image, setImage] = useState("");
     const [author, setAuthor] = useState({
         name: "",
         email: "",
@@ -26,8 +29,6 @@ export default function CreateBlog({ id }) {
     });
 
     const navigate = useNavigate();
-
-    let result = "";
 
     useEffect(() => {
         if (isTextnavigate.length != paragraphs.length) {
@@ -57,7 +58,7 @@ export default function CreateBlog({ id }) {
                 `${import.meta.env.VITE_BASE_API_URI}/api/profile/${id}`
             );
             const autherRes = response.data.profile;
-            //console.log(response.data.profile);
+            console.log(response.data.profile);
             setAuthor({
                 name: autherRes.first_name + " " + autherRes.last_name,
                 email: autherRes.email,
@@ -150,19 +151,29 @@ export default function CreateBlog({ id }) {
         }
     };
 
-    const handleSubmitBlog = async (event) => {
-        event.preventDefault();
-        if (paragraphs.length > 2) {
+    const handleCloseTag = (tag) => {
+        const updatedTags = tags.filter((t) => t !== tag);
+        setTags(updatedTags);
+        localStorage.setItem("tags", JSON.stringify(updatedTags));
+    };
+
+    useEffect(() => {
+        if (paragraphs.length >= 1) {
             let header = paragraphs[0];
-            result = paragraphs.slice(1).join("\n");
+            let result = paragraphs.slice(1).join("\n");
             setTitle(header);
             setContents(result);
         }
+    }, [paragraphs]);
+
+    const handleSubmitBlog = async (event) => {
+        event.preventDefault();
         try {
             if (title === "" || contents === "" || author === null) {
-                alert("Please fill all the fields");
+                Alert("Please fill all the fields", "warning", "top");
                 return;
             }
+
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_API_URI}/api/creatBlogs`,
                 {
@@ -182,8 +193,27 @@ export default function CreateBlog({ id }) {
                 setTitle("");
                 setContents("");
                 setParagraphs([]);
-                // alertMessage("บันทึกสําเร็จ", "success");
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                for (let i = 0; i < tags.length; i++) {
+                    await axios.post(
+                        `${import.meta.env.VITE_BASE_API_URI}/api/tags`,
+                        {
+                            blogid: response.data.blog._id,
+                            tagname: tags[i],
+                        },
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            withCredentials: true,
+                        }
+                    );
+                }
+                setTags([]);
+                localStorage.removeItem("tags");
                 navigate("/");
+                Alert("บันทึกสําเร็จ", "success", "top", false);
+                // alertMessage("บันทึกสําเร็จ", "success");
             } else {
                 alert("ไม่สามารถ publish blog ได้");
             }
@@ -199,19 +229,6 @@ export default function CreateBlog({ id }) {
             setTags(JSON.parse(localTags));
         }
     }, []);
-
-    //const convertList2string = () => {
-    //	if (paragraphs.length > 2) {
-    //		let header = paragraphs[0];
-    //		result = paragraphs.slice(1).join("\n");
-    //		setTitle(header);
-    //		setContents(JSON.stringify(result));
-    //	}
-    //	//console.log(`raw reslut ${JSON.stringify(result)} typeof ${typeof result}`);
-    //	//let content = result.split("")
-    //	//setTitle(title)
-    //	//console.log(`split string ${split} typeof ${typeof split}`);
-    //};
 
     return (
         <>
@@ -237,13 +254,10 @@ export default function CreateBlog({ id }) {
                     handleTagInputKey={handleTagInputKey}
                     inputTag={inputTag}
                     tags={tags}
+                    handleCloseTag={handleCloseTag}
                 />
 
                 {/* เพิ่มของ blog */}
-
-                {/*<button className="block" onClick={(e) => handleSubmitBlog(e)}>
-					
-				</button>*/}
             </div>
         </>
     );

@@ -77,7 +77,22 @@ router.put("/updateblog/:id", veriflyAuth, async (req, res) => {
 
 // get all blogs
 router.get("/blogs", async (req, res) => {
+    const tags = req.query.tags || null;
     try {
+        if (tags) {
+            const blogs = await Blogs.find({
+                tag: { $elemMatch: { tagname: tags } },
+            });
+            if (blogs == null) {
+                return res.status(400).send({
+                    message: "Blogs not found",
+                });
+            }
+            return res.status(200).send({
+                message: "Blogs found",
+                blogs,
+            });
+        }
         const blogs = await Blogs.find();
         if (blogs == null) {
             return res.status(400).send({

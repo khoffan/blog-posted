@@ -1,31 +1,33 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import Tag from "./Tag";
+import axios from "axios";
 
 export default function Tagbar() {
-	const tagName = [
-		"name1",
-		"name2",
-		"name3",
-		"name4",
-		"name5",
-		"name6",
-		"name7",
-		"name8",
-		"name9",
-		"name10",
-		"name10",
-		"name10",
-		"name10"
-	];
+    const [tags, setTags] = useState([]);
 
-	return (
-		<>
-			<div className="p-4 flex flex-wrap w-full gap-2 justify-start items-center">
-				<span className="text-xl text-center font-bold">Tag:</span>
-				{tagName.map((name, index) => (
-					<Tag key={index} tagName={name} />
-				))}
-			</div>
-		</>
-	);
+    const fetchTags = async () => {
+        try {
+            const response = await axios.get(
+                `${import.meta.env.VITE_BASE_API_URI}/api/tags`
+            );
+            setTags(response.data.message);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTags();
+    }, []);
+
+    return (
+        <>
+            <div className="p-4 flex flex-wrap w-full gap-2 justify-start items-center">
+                <span className="text-xl text-center font-bold">Tag:</span>
+                {tags.map((tag) => (
+                    <Tag key={tag._id} tagName={tag.tagname} />
+                ))}
+            </div>
+        </>
+    );
 }

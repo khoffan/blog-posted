@@ -24,20 +24,19 @@ function Header({
     toggleSearch,
     isSearchOpen,
 }) {
-    console.log(user);
     return (
         <>
             {isCreateBlog == true && user != null ? (
-                <div className="z-[102] top-0 left-0 w-full flex flex-row items-center justify-evenly p-6 bg-red-500">
+                <div className="z-[102] w-full flex flex-row items-center justify-evenly p-2 bg-red-500">
                     <div className="flex items-center gap-4">
                         <Link to="/">
                             <div className="flex items-center">
                                 <img
                                     src={logo}
                                     alt="profile"
-                                    className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
+                                    className="w-[40px] h-[40px] mx-2 bg-transparent rounded-full object-cover"
                                 />
-                                <span className="text-3xl font-bold text-white">
+                                <span className="text-2xl font-bold text-white">
                                     Litium
                                 </span>
                             </div>
@@ -66,7 +65,7 @@ function Header({
                     )}
                 </div>
             ) : (
-                <div className="z-[102] top-0 left-0 w-full flex flex-row items-center justify-between pl-[50px] pr-[80px] p-6 bg-red-500">
+                <div className="z-[102] w-full flex flex-row items-center justify-between pl-[50px] pr-[80px] p-2 bg-red-500">
                     <div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
                         <Link to="/">
                             <div className="flex items-center">

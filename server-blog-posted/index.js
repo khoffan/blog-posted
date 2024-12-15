@@ -46,7 +46,6 @@ app.get("/", (req, res) => {
     res.send({
         massage: "Hello World",
     });
-    console.log("Hello World");
 });
 
 //listen server

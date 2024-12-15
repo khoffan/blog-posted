@@ -1,7 +1,11 @@
-import { Button } from "@mui/material";
-import React from "react";
+import { PropTypes } from "prop-types";
 
-function LiComponent({ navTraffic, name, alertMessage }) {
+function LiComponent({ navTraffic, name }) {
+    LiComponent.propTypes = {
+        navTraffic: PropTypes.func,
+        name: PropTypes.string,
+    };
+
     return (
         <li className="mb-2 border border-1 border-gray-200">
             <button
@@ -22,6 +26,14 @@ export default function Dropdown({
     user,
     isImage,
 }) {
+    Dropdown.propTypes = {
+        navProfile: PropTypes.func,
+        logoutevent: PropTypes.func,
+        yourBlog: PropTypes.func,
+        alertMessage: PropTypes.string,
+        user: PropTypes.object,
+        isImage: PropTypes.bool,
+    };
     return (
         <>
             <div

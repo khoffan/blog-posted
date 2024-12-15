@@ -6,6 +6,7 @@ export default function TagFeold({
     inputTag,
     handleInputChange,
     handleTagInputKey,
+    handleCloseTag,
 }) {
     return (
         <div className="border border-2 border-red-500 w-1/2 p-[10px]">
@@ -14,11 +15,17 @@ export default function TagFeold({
                 {tags.map((tag, index) => {
                     return (
                         <div
-                            className="flex w-24 justify-between items-center bg-green-500 text-white py-2 px-4 rounded-md border border-green-700 text-sm cursor-pointer transition-all duration-300 transform hover:bg-green-600 hover:scale-105 active:bg-green-800"
+                            className="flex gap-4 justify-between items-center bg-white text-black py-2 px-4 rounded-md border border-green-700 text-sm cursor-pointer transition-all duration-300 transform hover:bg-gray-600 hover:scale-105 active:bg-gray-400"
                             key={index}
                         >
-                            <span className="">{tag}</span>
-                            <a className="block cursor-pointer hover:text-red-400 ">
+                            <div className="p-1.5 bg-black rounded-full hover:bg-white"></div>
+                            <p className="hover:text-white">{tag}</p>
+                            <a
+                                className="block cursor-pointer hover:text-red-400"
+                                onClick={() => {
+                                    handleCloseTag(tag);
+                                }}
+                            >
                                 <IconAwesome iconName={faXmark} />
                             </a>
                         </div>

@@ -32,20 +32,26 @@ router.post("/tags", veriflyAuth, async (req, res) => {
         });
         const saveTag = await tag.save();
 
-        await Blogs.findOneAndUpdate(
-            { _id: blogid },
-            {
-                $push: {
-                    tag: {
-                        tagid: saveTag._id.toString(),
-                        blogid: saveTag.blogid,
-                        tagname: saveTag.tagname,
-                        createdAt: saveTag.createdAt,
-                        updatedAt: saveTag.updatedAt,
+        const blog = await Blogs.findOne({ _id: blogid });
+        if (!blog) {
+            const newBlog = new Blogs({ _id: blogid, tag: [saveTag] });
+            await newBlog.save();
+        } else {
+            await Blogs.findOneAndUpdate(
+                { _id: blogid },
+                {
+                    $push: {
+                        tag: {
+                            tagid: saveTag._id.toString(),
+                            blogid: saveTag.blogid,
+                            tagname: saveTag.tagname,
+                            createdAt: saveTag.createdAt,
+                            updatedAt: saveTag.updatedAt,
+                        },
                     },
-                },
-            }
-        );
+                }
+            );
+        }
 
         return res.status(201).send({
             massage: "Tag created and updated successfully",
