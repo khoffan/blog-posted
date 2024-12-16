@@ -11,7 +11,9 @@ export default function CreateBlog({ id }) {
     CreateBlog.propTypes = {
         id: PropTypes.string.isRequired,
     };
-    const [paragraphs, setParagraphs] = useState([]);
+    const [paragraphs, setParagraphs] = useState([
+        { type: "text", content: "" },
+    ]);
     const [activeIndex, setActiveIndex] = useState(null);
     const [isTextnavigate, setIstextNavigate] = useState(
         Array(paragraphs.length).fill(false)
@@ -19,6 +21,7 @@ export default function CreateBlog({ id }) {
     const [isCreateBlog, setIscreateBlog] = useState(false);
     const paragraphRef = useRef([]);
     const [title, setTitle] = useState("");
+    const [blogImage, setBlogImage] = useState([]);
     const [contents, setContents] = useState("");
     const [tags, setTags] = useState([]);
     const [inputTag, setInputTag] = useState("");
@@ -42,13 +45,25 @@ export default function CreateBlog({ id }) {
             const saveParagraphs = JSON.parse(
                 localStorage.getItem("paragraphs")
             );
-            if (saveParagraphs != null && saveParagraphs.length > 0) {
-                setParagraphs(saveParagraphs);
+            console.log(saveParagraphs);
+
+            if (saveParagraphs?.paragraphs) {
+                setParagraphs(saveParagraphs.paragraphs);
+                setBlogImage(saveParagraphs.images || []);
             } else {
-                setParagraphs(["", ""]);
+                setParagraphs([
+                    { type: "text", content: "" },
+                    { type: "text", content: "" },
+                ]);
+                setBlogImage([]);
             }
         } catch (error) {
             console.log("err: ", error);
+            setParagraphs([
+                { type: "text", content: "" },
+                { type: "text", content: "" },
+            ]);
+            setBlogImage([]);
         }
     }, []);
 
@@ -74,12 +89,72 @@ export default function CreateBlog({ id }) {
         setIscreateBlog(true);
     }, []);
 
+    const handleFileUpload = async (e, index, blogid) => {
+        const file = e.target.files[0];
+        if (!file) {
+            Alert("กรุณาเลือกรูปภาพ", "warning", "top");
+            return;
+        }
+        const formData = new FormData();
+        const imageid = `img_${Date.now()}`;
+        formData.append("blogid", blogid);
+        formData.append("imageid", imageid);
+        formData.append("blog", file);
+        try {
+            const newParagraphs = [...paragraphs];
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_API_URI}/api/blog/images`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                }
+            );
+
+            const file_path = response.data.file.path;
+            const file_name = response.data.file.filename;
+            if (response.status === 200) {
+                setBlogImage((prev) => [
+                    ...prev,
+                    {
+                        id: imageid,
+                        image_path: file_path,
+                        image_name: file_name,
+                    },
+                ]);
+                newParagraphs[index] = {
+                    type: "image",
+                    content: imageid,
+                };
+                newParagraphs.splice(index + 1, 0, {
+                    type: "text",
+                    content: "",
+                }); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
+                setParagraphs(newParagraphs);
+                localStorage.setItem(
+                    "paragraphs",
+                    JSON.stringify({
+                        paragraphs: newParagraphs,
+                        images: [
+                            ...blogImage,
+                            { id: imageid, image_path: file_path },
+                        ],
+                    })
+                );
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const handleKeydown = (event, index) => {
         if (event.key === "Enter") {
             event.preventDefault();
 
             const newParagraphs = [...paragraphs];
-            newParagraphs.splice(index + 1, 0, ""); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
+            newParagraphs.splice(index + 1, 0, { type: "text", content: "" }); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
             setParagraphs(newParagraphs);
             setActiveIndex(index + 1);
 
@@ -89,27 +164,55 @@ export default function CreateBlog({ id }) {
                 }
             }, 0);
         }
-        if (event.key === "Backspace" && paragraphs[index] === "") {
-            if (paragraphs.length > 1) {
-                const newParagraphs = [...paragraphs];
-                newParagraphs.splice(index, 1); // ลบ textarea ที่ตำแหน่งนี้
-                setParagraphs(newParagraphs);
+        if (event.key === "Backspace") {
+            const currentParagraph = paragraphs[index];
+            if (
+                (currentParagraph.type === "text" &&
+                    currentParagraph.content === "") ||
+                currentParagraph.type === "image"
+            ) {
+                if (paragraphs.length > 1) {
+                    event.preventDefault();
+                    const newParagraphs = [...paragraphs];
+                    newParagraphs.splice(index, 1);
+                    setParagraphs(newParagraphs);
+                    localStorage.setItem(
+                        "paragraphs",
+                        JSON.stringify(newParagraphs)
+                    );
 
-                const newIndex = index > 0 ? index - 1 : 0;
-                setActiveIndex(newIndex);
+                    const newIndex = index > 0 ? index - 1 : 0;
+                    setActiveIndex(newIndex);
 
-                requestAnimationFrame(() => {
-                    paragraphRef.current[index - 1]?.focus();
-                }, 0);
+                    requestAnimationFrame(() => {
+                        if (paragraphRef.current[newIndex]) {
+                            paragraphRef.current[newIndex].focus();
+                        }
+                    }, 0);
+                }
             }
+        }
+
+        // ลบรูปภาพเมื่อกด Delete
+        if (event.key === "Delete" && paragraphs[index].type === "image") {
+            handleDeleteImage(index);
         }
     };
 
     const handleContent = (event, index) => {
         const newparagraphs = [...paragraphs];
-        newparagraphs[index] = event.target.value;
+        newparagraphs[index] = {
+            type: "text",
+            content: event.target.value,
+        };
         setParagraphs(newparagraphs);
-        localStorage.setItem("paragraphs", JSON.stringify(newparagraphs));
+        localStorage.setItem(
+            "paragraphs",
+            JSON.stringify({
+                paragraphs: newparagraphs,
+                images: [...blogImage],
+            })
+        );
     };
 
     //const handleChangeDescription = (event) => {
@@ -131,6 +234,26 @@ export default function CreateBlog({ id }) {
 
     const handleInputChange = (e) => {
         setInputTag(e.target.value);
+    };
+
+    const handleDeleteImage = (index) => {
+        const imageid = paragraphs[index].content;
+        const newImage = blogImage.filter((img) => img.id !== imageid);
+        setBlogImage(newImage);
+
+        const newParagraphs = [...paragraphs];
+        newParagraphs.splice(index, 1);
+        if (newParagraphs.length === 0) {
+            newParagraphs.push({ type: "text", content: "" });
+        }
+        setParagraphs(newParagraphs);
+        localStorage.setItem(
+            "paragraphs",
+            JSON.stringify({
+                paragraphs: newParagraphs,
+                images: newImage,
+            })
+        );
     };
 
     const handleTagInputKey = (e) => {
@@ -159,8 +282,18 @@ export default function CreateBlog({ id }) {
 
     useEffect(() => {
         if (paragraphs.length >= 1) {
-            let header = paragraphs[0];
-            let result = paragraphs.slice(1).join("\n");
+            let header = paragraphs[0].content;
+            let result = paragraphs
+                .slice(1)
+                .map((p) => {
+                    if (p.type === "text") {
+                        return p.content;
+                    } else if (p.type === "image") {
+                        return `[image:${p.content}]`;
+                    }
+                    return "";
+                })
+                .join("\n");
             setTitle(header);
             setContents(result);
         }
@@ -180,6 +313,7 @@ export default function CreateBlog({ id }) {
                     title: title,
                     description: contents,
                     author,
+                    blogImage: blogImage,
                 },
                 {
                     headers: {
@@ -193,7 +327,7 @@ export default function CreateBlog({ id }) {
                 setTitle("");
                 setContents("");
                 setParagraphs([]);
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 500));
                 for (let i = 0; i < tags.length; i++) {
                     await axios.post(
                         `${import.meta.env.VITE_BASE_API_URI}/api/tags`,
@@ -232,7 +366,7 @@ export default function CreateBlog({ id }) {
 
     return (
         <>
-            <div className="w-full flex flex-col items-center justify-center gap-4 ">
+            <div className="w-full h-full flex flex-col items-center justify-center gap-4 ">
                 <Nav
                     isCreateBlog={isCreateBlog}
                     publicState={handleSubmitBlog}
@@ -247,6 +381,9 @@ export default function CreateBlog({ id }) {
                     handleFocus={handleFocus}
                     isTextnavigate={isTextnavigate}
                     handleNavatebutton={handleNavatebutton}
+                    handleFileUpload={handleFileUpload}
+                    handleDeleteImage={handleDeleteImage}
+                    blogImage={blogImage}
                 />
 
                 <TagFeold
@@ -256,7 +393,7 @@ export default function CreateBlog({ id }) {
                     tags={tags}
                     handleCloseTag={handleCloseTag}
                 />
-
+                <div className="w-full h-10"></div>
                 {/* เพิ่มของ blog */}
             </div>
         </>

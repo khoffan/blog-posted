@@ -4,21 +4,41 @@ const router = express.Router();
 const Blogs = require("../Model/Blogs");
 const Profiles = require("../Model/Profile");
 const veriflyAuth = require("../middleware/veriflyAuth");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "uploads/blogs");
+    },
+    filename: function (req, file, cb) {
+        const fileName = Date.now() + "-" + file.originalname;
+        cb(null, fileName);
+    },
+});
+
+const upload = multer({ storage });
 
 // blogs api
 router.post("/creatBlogs", veriflyAuth, async (req, res) => {
     try {
-        const { title, description, author, tags } = req.body;
+        const { title, description, author, blogImage } = req.body;
         if (!(title && description && author)) {
             return res.status(400).send({
                 massage: "All input is required",
             });
         }
+        console.log("createblog", blogImage);
         const blog = new Blogs({
             title,
             description,
             author,
-            tag: tags,
+            images: blogImage.map((img) => ({
+                imageId: img.id,
+                imageName: img.image_name,
+                imagePath: img.image_path,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            })),
         });
         await blog.save();
         const blog_author = await Blogs.findOne({
@@ -78,11 +98,12 @@ router.put("/updateblog/:id", veriflyAuth, async (req, res) => {
 // get all blogs
 router.get("/blogs", async (req, res) => {
     const tags = req.query.tags || null;
+    const sort = req.query.sort || 1;
     try {
         if (tags) {
             const blogs = await Blogs.find({
-                tag: { $elemMatch: { tagname: tags } },
-            });
+                "tag.tagname": { $regex: tags, $options: "i" },
+            }).sort({ createdAt: Number(sort) });
             if (blogs == null) {
                 return res.status(400).send({
                     message: "Blogs not found",
@@ -93,7 +114,7 @@ router.get("/blogs", async (req, res) => {
                 blogs,
             });
         }
-        const blogs = await Blogs.find();
+        const blogs = await Blogs.find().sort({ createdAt: Number(sort) });
         if (blogs == null) {
             return res.status(400).send({
                 message: "Blogs not found",
@@ -205,5 +226,34 @@ router.put("/blog/dislike/:id", async (req, res) => {
         });
     }
 });
+
+router.post(
+    "/blog/images",
+    upload.single("blog"),
+    veriflyAuth,
+    async (req, res) => {
+        try {
+            const file = req.file;
+
+            if (!file) {
+                return res.status(400).send({
+                    message: "files not found",
+                });
+            }
+            // store file in array
+
+            return res.status(200).send({
+                message: "upload images success",
+                file,
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(401).send({
+                massage: "upload images unsuccess",
+                error,
+            });
+        }
+    }
+);
 
 module.exports = router;

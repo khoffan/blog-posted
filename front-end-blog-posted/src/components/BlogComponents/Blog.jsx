@@ -28,12 +28,11 @@ export default function Blog({
             {isUser == false ? (
                 <div
                     key={index}
-                    className="z-10 block mx-auto max-w-3/4 h-1/4 border rounded-md p-3 my-2 shadow-md "
+                    className="z-10 block mx-auto max-w-full h-1/4 border rounded-md p-3 my-2 shadow-md "
                 >
                     <div className="flex flex-row items-center justify-between mx-[30px] p-[10px]">
                         <div>
                             <h1 className="text-start text-3xl">{title}</h1>
-                            <p className="text-start">{content}</p>
                         </div>
                         <div>
                             <div className="flex flex-row items-center mx-5">
@@ -46,39 +45,44 @@ export default function Blog({
                                 />
                                 <p className="text-base font-bold">{name}</p>
                             </div>
-                            <p className="text-[10px]">{formatDate}</p>
+                            <p className="text-[10px] font-thin">
+                                {formatDate}
+                            </p>
                         </div>
                     </div>
                 </div>
             ) : (
                 <div
                     key={index}
-                    className="z-10 relative block mx-auto max-w-[700px] min-h-[250px] border rounded-md p-[10px] mb-[10px] mt-[150px] shadow-md hover:outline-offset-0 hover:outline"
+                    className="w-1/2 p-4 mx-auto border border-gray-300 rounded-md showdow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
                 >
-                    <div className="flex flex-row justify-between items-center mx-5">
-                        <img
-                            src={`${
-                                import.meta.env.VITE_BASE_API_URI
-                            }/${imageUrl}`}
-                            width={20}
-                            className="rounded-full object-cover"
-                        />
-                        <p className="text-base font-bold">{name}</p>
-                    </div>
-                    <div className="flex flex-row items-center justify-between mx-[30px] p-[10px]">
-                        <div>
-                            <h1 className="text-start text-3xl">{title}</h1>
-                            <p className="text-start">{content}</p>
+                    <div className="flex flex-row gap-4 items-center justify-between my-4">
+                        <div className="flex flex-row items-center justify-between gap-2">
+                            <div>
+                                <h1 className="text-start text-3xl">{title}</h1>
+                            </div>
                         </div>
-                        <div>
-                            <p className="text-[15px]">{formatDate}</p>
+                        <div className="flex flex-col justify-end">
+                            <div className="flex flex-row items-center">
+                                <img
+                                    src={`${
+                                        import.meta.env.VITE_BASE_API_URI
+                                    }/${imageUrl}`}
+                                    width={30}
+                                    className="rounded-full object-cover"
+                                />
+                                <p className="text-base font-bold">{name}</p>
+                            </div>
+                            <div>
+                                <p className="text-[15px]">{formatDate}</p>
+                            </div>
                         </div>
                     </div>
-                    <div className="absolute flex flex-row left-[400px]">
-                        <button className="inline mx-2 border px-2 w-[100px] bg-gray-400 hover:bg-black hover:text-white">
+                    <div className="flex flex-row gap-4 justify-end mx-5 p-2">
+                        <button className="p-2 bg-blue-500 w-32 rounded-lg">
                             Edit
                         </button>
-                        <button className="inline mx-2 border px-2 w-[100px] bg-red-400 hover:bg-red-500">
+                        <button className="p-2 bg-red-500 w-32 rounded-lg">
                             Delete
                         </button>
                     </div>

@@ -1,7 +1,7 @@
 import { faCirclePlay, faImage } from "@fortawesome/free-solid-svg-icons";
 import IconAwesome from "../IconAwesome";
 
-export default function TextNavigate({ handleFile }) {
+export default function TextNavigate({ handleFile, index }) {
     return (
         <>
             <ul className="flex gap-4 p-2 h-[60px] w-full">
@@ -14,8 +14,9 @@ export default function TextNavigate({ handleFile }) {
                 <input
                     id="file-upload"
                     type="file"
+                    accept="image/*"
                     className="hidden"
-                    onChange={console.log("file")}
+                    onChange={(e) => handleFile(e, index)}
                 />
                 <button type="button" className="inline w-[40px] h-[40px] mr-2">
                     <IconAwesome iconName={faCirclePlay} />
