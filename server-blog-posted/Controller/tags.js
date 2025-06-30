@@ -6,9 +6,17 @@ const veriflyAuth = require("../middleware/veriflyAuth");
 
 router.get("/tags", async (req, res) => {
     try {
-        const tags = await Tags.find();
+        const tags = await Tags.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    tagname: { $addToSet: "$tagname" },
+                },
+            },
+        ]);
         return res.status(200).send({
-            message: tags,
+            message: "Tags found",
+            tags,
         });
     } catch (error) {
         return res.status(401).send({

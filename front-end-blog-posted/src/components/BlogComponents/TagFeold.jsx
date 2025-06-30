@@ -9,7 +9,7 @@ export default function TagFeold({
     handleCloseTag,
 }) {
     return (
-        <div className="border border-2 border-red-500 w-1/2 p-[10px]">
+        <div className="h-full w-1/2 p-[10px] my-5">
             <p className="text-xl font-bold mb-2">Tag</p>
             <div className="flex w-full flex-wrap gap-5">
                 {tags.map((tag, index) => {

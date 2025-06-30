@@ -84,7 +84,7 @@ function UserMenu({
                         handleDropdown={handleDropdown}
                         handleLogout={handleLogout}
                         handleProfileNvigate={handleProfileNvigate}
-                        handletoblogpage={handletoWriteblog}
+                        handletoblogpage={handletoblogpage}
                         isDropdown={isDropdown}
                         isImage={isImage}
                         user={user}
@@ -105,7 +105,7 @@ function UserMenu({
                         handleDropdown={handleDropdown}
                         handleLogout={handleLogout}
                         handleProfileNvigate={handleProfileNvigate}
-                        handletoblogpage={handletoWriteblog}
+                        handletoblogpage={handletoblogpage}
                         isDropdown={isDropdown}
                         isImage={isImage}
                         user={user}

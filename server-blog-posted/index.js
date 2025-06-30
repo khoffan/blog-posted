@@ -22,14 +22,12 @@ connectDB();
 app.use(CookiesParser());
 app.use(bodyParser.json());
 app.use(
-    cors({
-        origin: "http://localhost:5173",
-        credentials: true,
-    })
+	cors({
+		origin: process.env.CLIENT_URL,
+		credentials: true
+	})
 );
-app.use(
-    session({ secret: "keyboard cat", resave: false, saveUninitialized: false })
-);
+app.use(session({ secret: "keyboard cat", resave: false, saveUninitialized: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -43,13 +41,13 @@ app.use("/api", TagsController);
 // support json encoded bodies
 
 app.get("/", (req, res) => {
-    res.send({
-        massage: "Hello World",
-    });
+	res.send({
+		massage: "Hello World"
+	});
 });
 
 //listen server
 const port = process.env.POST || 3001;
 app.listen(port, () => {
-    console.log(`Example app listening ${port}`);
+	console.log(`Example app listening ${port}`);
 });

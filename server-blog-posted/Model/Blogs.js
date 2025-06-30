@@ -56,14 +56,15 @@ const Blogs = Schema(
             ],
             default: null,
         },
-        image_name: {
-            type: String,
-            default: null,
-        },
-        image_path: {
-            type: String,
-            default: null,
-        },
+        images: [
+            {
+                imageId: String,
+                imageName: String,
+                imagePath: String,
+                createdAt: Date,
+                updatedAt: Date,
+            },
+        ],
     },
     {
         timestamps: true,
