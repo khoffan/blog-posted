@@ -41,7 +41,11 @@ export default function ParagraphFeild({
                                     ref={(el) =>
                                         (paragraphRef.current[index] = el)
                                     }
-                                    className="left-[0px] min-w-[80%] min-h-[20px] my-[8px] pt-[4px] text-base outline-none resize-none"
+                                    className={`left-[0px] min-w-[80%] min-h-[30px] my-[8px] pt-[4px] text-base outline-none resize-none ${
+                                        index === 0
+                                            ? "text-xl font-bold border-b border-gray-300"
+                                            : ""
+                                    }`}
                                     onChange={(event) =>
                                         handleContent(event, index)
                                     }
@@ -59,7 +63,7 @@ export default function ParagraphFeild({
                                     <img
                                         src={getImageFile(paragraph.content)}
                                         alt="blog_image"
-                                        className="max-w-full h-auto"
+                                        className="max-w-full h-3/4"
                                         style={{ objectFit: "contain" }}
                                     />
                                     <button

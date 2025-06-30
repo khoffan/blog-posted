@@ -1,12 +1,23 @@
+import PropTypes from "prop-types";
+
 export default function Blog({
     index,
     imageUrl,
     name,
     title,
-    content,
     creatDate,
     isUser,
+    tags = [],
 }) {
+    Blog.propTypes = {
+        index: PropTypes.number,
+        imageUrl: PropTypes.string,
+        name: PropTypes.string,
+        title: PropTypes.string,
+        creatDate: PropTypes.string,
+        isUser: PropTypes.bool,
+        tags: PropTypes.array,
+    };
     const date = new Date(creatDate);
     const options = {
         year: "numeric",
@@ -22,32 +33,46 @@ export default function Blog({
     // 	return text;
     // };
     // let contenttrim = truncateText(content, 40);
-
     return (
         <>
             {isUser == false ? (
-                <div
-                    key={index}
-                    className="z-10 block mx-auto max-w-full h-1/4 border rounded-md p-3 my-2 shadow-md "
-                >
-                    <div className="flex flex-row items-center justify-between mx-[30px] p-[10px]">
-                        <div>
-                            <h1 className="text-start text-3xl">{title}</h1>
+                <div className="z-10 w-full h-auto border border-gray-300 rounded-md p-3 my-2 shadow-md hover:shadow-lg hover:bg-gray-100">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-2 md:p-[10px] space-y-4 md:space-y-0">
+                        <div className="flex flex-col gap-4 items-start w-full md:w-2/3">
+                            <h1 className="text-start text-xl md:text-3xl">
+                                {title}
+                            </h1>
+                            <div className="flex flex-row flex-wrap items-center gap-2">
+                                {tags.map((tag, index) => (
+                                    <span
+                                        key={index}
+                                        className="text-xs md:text-sm py-1 px-2 md:px-4 border border-gray-600 text-black rounded-lg"
+                                    >
+                                        {tag.tagname}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
-                        <div>
-                            <div className="flex flex-row items-center mx-5">
+                        <div className="w-full md:w-auto">
+                            <div className="flex flex-row items-center gap-2 md:gap-4">
                                 <img
                                     src={`${
                                         import.meta.env.VITE_BASE_API_URI
                                     }/${imageUrl}`}
                                     width={40}
+                                    height={40}
                                     className="rounded-full object-cover"
+                                    alt={name}
                                 />
-                                <p className="text-base font-bold">{name}</p>
+                                <div>
+                                    <p className="text-sm md:text-base font-bold">
+                                        {name}
+                                    </p>
+                                    <p className="text-[10px] font-thin">
+                                        {formatDate}
+                                    </p>
+                                </div>
                             </div>
-                            <p className="text-[10px] font-thin">
-                                {formatDate}
-                            </p>
                         </div>
                     </div>
                 </div>

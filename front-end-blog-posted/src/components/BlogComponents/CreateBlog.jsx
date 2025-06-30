@@ -366,12 +366,11 @@ export default function CreateBlog({ id }) {
 
     return (
         <>
-            <div className="w-full h-full flex flex-col items-center justify-center gap-4 ">
+            <div className="w-full flex flex-col items-center justify-center gap-4 ">
                 <Nav
                     isCreateBlog={isCreateBlog}
                     publicState={handleSubmitBlog}
                 />
-
                 <ParagraphFeild
                     paragraphs={paragraphs}
                     handleContent={handleContent}
