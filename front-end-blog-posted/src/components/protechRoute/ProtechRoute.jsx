@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
-import axios from "axios";
 
 export default function ProtechRoute({ redirectPath = "/", children }) {
 	const location = useLocation();
@@ -22,7 +21,7 @@ export default function ProtechRoute({ redirectPath = "/", children }) {
 
 	useEffect(() => {
 		checkToken();
-	});
+	},[]);
 
 	if (isProtect) {
 		return <Navigate to={redirectPath} />;

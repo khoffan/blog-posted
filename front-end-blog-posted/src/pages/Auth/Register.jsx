@@ -32,7 +32,7 @@ export default function Register() {
 				return false;
 			}
 			const response = await axios.post(
-				"http://localhost:3001/api/register",
+				`${import.meta.env.VITE_BASE_API_URI}/api/register`,
 				{
 					first_name: fname,
 					last_name: lname,

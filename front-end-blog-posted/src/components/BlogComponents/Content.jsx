@@ -67,10 +67,10 @@ function Home({ search }) {
 				<>
 					<div className="flex flex-row w-full h-full gap-2 justify-center ">
 						<div className="w-full px-8 overflow-auto h-full md: px-8 w-full overflow-auto h-screen">
-							{content.length > 0 ? (
+							{content?.length > 0 ? (
 								<>
 									<Tagbar sendTags={handleTagsChild} />
-									{content.map((blog) => {
+									{content?.map((blog) => {
 										return (
 											<>
 												<button
