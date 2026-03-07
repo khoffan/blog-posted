@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const Users = require("../Model/Users");
 const Profiles = require("../Model/Profile");
-const veriflyAuth = require("../middleware/veriflyAuth.js");
+const verifyAuth = require("../middleware/verifyAuth.js");
 
 router.post("/register", async (req, res) => {
     try {
@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
         const { email, password } = req.body;
         if (!(email && password)) {
             res.status(400).send({
-                massage: "กรุณากรอกข้อมูลให้ครบถ้วน",
+                message: "กรุณากรอกข้อมูลให้ครบถ้วน",
             });
         }
         const user = await Users.findOne({ email: email });
@@ -76,16 +76,16 @@ router.post("/login", async (req, res) => {
                 sameSite: "none",
             });
             return res.status(200).send({
-                massage: "Login successfully",
+                message: "Login successfully",
             });
         } else {
             return res.status(404).send({
-                massage: "Invalid email or password",
+                message: "Invalid email or password",
             });
         }
     } catch (err) {
         return res.status(401).send({
-            massage: "Invalid email or password",
+            message: "Invalid email or password",
             error: err,
         });
     }
@@ -97,29 +97,29 @@ router.post("/logout", async (req, res) => {
         if (token) {
             res.clearCookie("token");
             return res.status(200).send({
-                massage: "Logout successfully",
+                message: "Logout successfully",
             });
         }
         return res.status(401).send({
-            massage: "Unauthenticated",
+            message: "Unauthenticated",
         });
     } catch (error) {
         return res.status(401).send({
-            massage: "Invalid email or password",
+            message: "Invalid email or password",
             error: error.massage,
         });
     }
 });
 
-router.get("/protected-route", veriflyAuth, (req, res) => {
+router.get("/protected-route", verifyAuth, (req, res) => {
     try {
         return res.status(200).send({
-            massage: "Welcome to protected route",
+            message: "Welcome to protected route",
             protect: true,
         });
     } catch (error) {
         return res.status(401).send({
-            massage: "Unauthenticated",
+            message: "Unauthenticated",
             error: error.massage,
             protect: false,
         });

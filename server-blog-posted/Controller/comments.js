@@ -1,10 +1,10 @@
 const express = require("express");
-const router = express();
+const router = express.Router();
 
 const Comments = require("../Model/Comments");
-const veriflyAuth = require("../middleware/veriflyAuth");
+const verifyAuth = require("../middleware/verifyAuth");
 
-router.post("/comment", veriflyAuth, async (req, res) => {
+router.post("/comment", verifyAuth, async (req, res) => {
 	try {
 		const commentData = req.body;
 		if (!commentData) {

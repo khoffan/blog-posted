@@ -1,72 +1,41 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
-import axios from "axios";
+import useAuthStore from "../../store/useAuthStore";
 
-function Nav({ isCreateBlog, publicState, sreach, handleSreaching, handleSearchParams }) {
+function Nav({ isCreateBlog, publicState }) {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
-	const [isLogin, setIsLogin] = useState(false);
-	const [user, setUser] = useState(null);
-	const [isImage, setIsIMage] = useState(false);
 	const [isDropdown, setIsDropdown] = useState(false);
-	const [alertMessage, setAlertMessage] = useState(null);
 
+	const { user, isLogin, isImage, fetchUser, logout } = useAuthStore();
 	const navigate = useNavigate();
 
 	const toggleSearch = () => {
 		setIsSearchOpen(!isSearchOpen);
 	};
 
-	const handleResponse = async () => {
-		try {
-			const res = await axios.get(`${import.meta.env.VITE_BASE_API_URI}/api/user`, {
-				withCredentials: true,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			});
+	useEffect(() => {
+		fetchUser();
+	}, []);
 
-			if (res.status === 200) {
-				if (res.data.auth == true) {
-					setIsLogin(true);
-				}
-				const userData = res.data.user;
-				setUser(userData);
-				if (res.data.user.image_path) {
-					setIsIMage(true);
-				}
-			}
-			//console.log(res.data.user.image_path);
-		} catch (error) {
-			if (error.response && error.response.status === 401) {
-				navigate("/");
-				// Handle token expiration here, for example, by redirecting to the login page
-				setIsLogin(false); // You can also call your alertToken function here if needed
-			} else {
-				// Handle other types of errors
-				console.log("Error:", error);
-			}
-		}
-	};
-
-	const handleProfileNvigate = () => {
+	const handleProfileNavigate = () => {
 		if (isLogin) {
-			navigate(`/user/profile/`, { state: { user } });
-			//console.log(user.email);
+			navigate(`/user/profile/`);
 		} else {
 			navigate("/login");
 		}
 	};
-	const handletoWriteblog = () => {
-		if (isLogin) {
+
+	const handleToWriteBlog = () => {
+		if (isLogin && user) {
 			navigate(`/create-blog/${user.authid}`);
-			//console.log(user.email);
 		} else {
 			navigate("/");
 		}
 	};
-	const handletoblogpage = () => {
-		if (isLogin) {
+
+	const handleToBlogPage = () => {
+		if (isLogin && user) {
 			navigate(`/blog/${user.authid}`);
 		} else {
 			navigate("/");
@@ -84,49 +53,31 @@ function Nav({ isCreateBlog, publicState, sreach, handleSreaching, handleSearchP
 	};
 
 	const handleLogout = async () => {
-		try {
-			const res = await axios.post("http://localhost:3001/api/logout", null, {
-				withCredentials: true
-			});
-			if (res.status === 200) {
-				setIsLogin(false);
-				setAlertMessage(res.data.message);
-				setTimeout(() => {
-					navigate("/", { state: { isLogin: true } });
-				}, 3000);
-			}
-		} catch (error) {
-			console.log(error);
+		const result = await logout();
+		if (result.success) {
+			setTimeout(() => {
+				navigate("/");
+			}, 500);
 		}
 	};
 
-	useEffect(() => {
-		handleResponse();
-	}, []);
-
 	return (
-		<>
-			<Header
-				handleCheckLogin={handleCheckLogin}
-				handleDropdown={handleDropdown}
-				handleLogout={handleLogout}
-				handleProfileNvigate={handleProfileNvigate}
-				handleSreaching={handleSreaching}
-				handletoWriteblog={handletoWriteblog}
-				handletoblogpage={handletoblogpage}
-				publicState={publicState}
-				isCreateBlog={isCreateBlog}
-				isDropdown={isDropdown}
-				isImage={isImage}
-				isLogin={isLogin}
-				user={user}
-				sreach={sreach}
-				toggleSearch={toggleSearch}
-				isSearchOpen={isSearchOpen}
-				alertMessage={alertMessage}
-				handleSearchParams={handleSearchParams}
-			/>
-		</>
+		<Header
+			handleCheckLogin={handleCheckLogin}
+			handleDropdown={handleDropdown}
+			handleLogout={handleLogout}
+			handleProfileNavigate={handleProfileNavigate}
+			handleToWriteBlog={handleToWriteBlog}
+			handleToBlogPage={handleToBlogPage}
+			publicState={publicState}
+			isCreateBlog={isCreateBlog}
+			isDropdown={isDropdown}
+			isImage={isImage}
+			isLogin={isLogin}
+			user={user}
+			toggleSearch={toggleSearch}
+			isSearchOpen={isSearchOpen}
+		/>
 	);
 }
 

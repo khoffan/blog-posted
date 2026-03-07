@@ -1,117 +1,98 @@
-import React, { useState } from "react";
-import Footter from "../../components/Footter";
-import { Link } from "react-router-dom";
-import Fromfeild from "../../components/Fromfeild";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import FormField from "../../components/FormField";
+import useAuthStore from "../../store/useAuthStore";
+import logo from "../../assets/logo-litium.png";
 
 export default function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [message, setMessage] = useState("");
-	const [isShow, setIsShow] = useState(false);
 
 	const navigate = useNavigate();
-
-	const showMassageErroe = (msg) => {
-		setIsShow(true);
-		setMessage(msg);
-		setTimeout(() => {
-			setIsShow(false);
-		}, 1500);
-	};
+	const { login, isLoading } = useAuthStore();
 
 	const handleSubmitLogin = async (event) => {
 		event.preventDefault();
-		try {
-			if (email == "") {
-				showMassageErroe("กรุณากรอก Email");
-			}
-			if (password == "") {
-				showMassageErroe("กรุณากรอก password");
-			}
-			if (email != "" || password != "") {
-				const response = await axios.post(
-					`${import.meta.env.VITE_BASE_API_URI}/api/login`,
-					{
-						email: email,
-						password: password
-					},
-					{
-						withCredentials: true
-					}
-				);
-				console.log(response.status);
-				if (response.status === 200) {
-					showMassageErroe(response.data.massage);
-					setEmail("");
-					setPassword("");
-					setTimeout(() => {
-						navigate(`/`);
-					}, 500);
-				} else {
-					showMassageErroe("Email หรือ Password ไม่ถูกต้อง");
-				}
-			} else {
-				showMassageErroe("กรุณากรอกข้อมูลให้ครบถ้วน");
-			}
-		} catch (error) {
-			if (error.response && error.response.data) {
-				showMassageErroe(error.response.data.massage);
-				console.log(error); // Use the error message from the server response if available
-			} else {
-				showMassageErroe("Failed to login. Please try again later."); // Generic error message if no specific error message is available
-			}
+		if (!email || !password) {
+			setMessage("Please fill in both email and password.");
+			return;
+		}
+
+		setMessage("");
+		const result = await login(email, password);
+		if (result.success) {
+			navigate("/");
+		} else {
+			setMessage(result.message);
 		}
 	};
 
 	return (
-		<>
-			<div className="flex flex-col min-h-screen">
-				<div className="grid grid-cols-2 flex-grow">
-					<div className="bg-red-400 flex flex-col justify-center items-center z-10 border-r border-black">
-						<img src="" className="bg-black-400 p-auto border-r w-40 h-40 hidden" />
-						<h2 className="text-9xl text-black">Litium</h2>
-						<p className="text-black text-lg">Blog Post Sing In</p>
-					</div>
-					<div className=" flex flex-col justify-center bg-slate-200">
-						<div className="mx-36">
-							<h1 className="text-3xl text-blod flex justify-center items-center">
-								Sing In
-							</h1>
-							<div className="border boerder-black p-auto flex flex-col justify-center items-center">
-								<Fromfeild
-									title="Email"
-									value={email}
-									onChange={(value) => setEmail(value)}
-								/>
-								<Fromfeild
-									value={password}
-									title="Password"
-									onChange={(value) => setPassword(value)}
-								/>
-								<label className="inline-flex mt-3 items-center">
-									<span className="ml-2 text-gray-700 text-sm">
-										สมัครบัญชีได้ที่นี่
-									</span>
-									<Link to="/signup">
-										<span className="ml-2 text-red-500 text-sm">Register</span>
-									</Link>
-								</label>
-								<button
-									type="submit"
-									onClick={handleSubmitLogin}
-									className="my-5  text-white rounded-md bg-black hover:bg-gray-200 p-2 w-1/2 flex justify-center  hover:text-black hover:border hover:border-black "
-								>
-									Sing In
-								</button>
-								{isShow && <p>{message}</p>}
+		<div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+			<div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+				<div className="px-8 py-10">
+					{/* Header */}
+					<div className="text-center mb-10">
+						<Link to="/" className="inline-block mb-6">
+							<div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-serif font-bold italic text-3xl leading-none mx-auto">
+								L
 							</div>
+						</Link>
+						<h1 className="text-3xl font-serif tracking-tight text-gray-900 mb-2">Welcome back.</h1>
+						<p className="text-gray-500 text-sm">Sign in to get personalized story recommendations, follow authors, and more.</p>
+					</div>
+
+					{/* Form */}
+					<form onSubmit={handleSubmitLogin} className="space-y-6">
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+							<input
+								type="email"
+								className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								required
+								placeholder="Enter your email"
+							/>
 						</div>
+
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+							<input
+								type="password"
+								className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								required
+								placeholder="Enter your password"
+							/>
+						</div>
+
+						{message && (
+							<p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-lg">{message}</p>
+						)}
+
+						<button
+							type="submit"
+							disabled={isLoading}
+							className="w-full bg-black text-white rounded-full py-3.5 px-4 font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-70 transition-colors shadow-md"
+						>
+							{isLoading ? "Signing in..." : "Sign In"}
+						</button>
+					</form>
+
+					{/* Footer */}
+					<div className="mt-8 text-center">
+						<p className="text-sm text-gray-600">
+							No account?{" "}
+							<Link to="/signup" className="text-green-600 font-medium hover:text-green-700 hover:underline transition-all">
+								Create one
+							</Link>
+						</p>
 					</div>
 				</div>
-				<Footter />
 			</div>
-		</>
+		</div>
 	);
 }

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Tags = require("../Model/Tags");
 const Blogs = require("../Model/Blogs");
-const veriflyAuth = require("../middleware/veriflyAuth");
+const verifyAuth = require("../middleware/verifyAuth");
 
 router.get("/tags", async (req, res) => {
     try {
@@ -26,12 +26,12 @@ router.get("/tags", async (req, res) => {
     }
 });
 
-router.post("/tags", veriflyAuth, async (req, res) => {
+router.post("/tags", verifyAuth, async (req, res) => {
     try {
         const { blogid, tagname } = req.body;
         if (!(blogid && tagname)) {
             return res.status(400).send({
-                massage: "All input is required",
+                message: "All input is required",
             });
         }
         const tag = new Tags({
@@ -62,31 +62,31 @@ router.post("/tags", veriflyAuth, async (req, res) => {
         }
 
         return res.status(201).send({
-            massage: "Tag created and updated successfully",
+            message: "Tag created and updated successfully",
             tag: saveTag,
         });
     } catch (error) {
         console.log(error);
         return res.status(401).send({
-            massage: "creat tag unsuccess",
+            message: "creat tag unsuccess",
             error,
         });
     }
 });
 
-router.put("/tags/:id", veriflyAuth, async (req, res) => {
+router.put("/tags/:id", verifyAuth, async (req, res) => {
     try {
         const idObj = req.params;
         const tagid = idObj.id;
         if (!tagid) {
             return res.status(400).send({
-                massage: "กรุณาใส่ params ให้ถูกต้อง",
+                message: "กรุณาใส่ params ให้ถูกต้อง",
             });
         }
         const { blogid, tagname } = req.body;
         if (!(blogid && tagname)) {
             return res.status(400).send({
-                massage: "All input is required",
+                message: "All input is required",
             });
         }
         const tag = await Tags.findOneAndUpdate(
@@ -110,25 +110,25 @@ router.put("/tags/:id", veriflyAuth, async (req, res) => {
             }
         );
         return res.status(201).send({
-            massage: "Tag created and updated successfully",
+            message: "Tag created and updated successfully",
             tag,
         });
     } catch (error) {
         console.log(error);
         return res.status(401).send({
-            massage: "creat tag unsuccess",
+            message: "creat tag unsuccess",
             error,
         });
     }
 });
 
-router.delete("/tags/:id", veriflyAuth, async (req, res) => {
+router.delete("/tags/:id", verifyAuth, async (req, res) => {
     try {
         const { id } = req.params;
         const tag = await Tags.findByIdAndDelete(id);
         if (!tag) {
             return res.status(404).send({
-                massage: "Tag not found",
+                message: "Tag not found",
             });
         }
         await Blogs.findOneAndUpdate(
@@ -136,13 +136,13 @@ router.delete("/tags/:id", veriflyAuth, async (req, res) => {
             { $pull: { tag: { tagid: id } } }
         );
         return res.status(200).send({
-            massage: "Tag deleted successfully",
+            message: "Tag deleted successfully",
             tag,
         });
     } catch (error) {
         console.log(error);
         return res.status(401).send({
-            massage: "delete tag unsuccess",
+            message: "delete tag unsuccess",
             error,
         });
     }

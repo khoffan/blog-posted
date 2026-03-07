@@ -27,7 +27,7 @@ app.use(
 		credentials: true
 	})
 );
-app.use(session({ secret: "keyboard cat", resave: false, saveUninitialized: false }));
+app.use(session({ secret: process.env.SESSION_SECRET || "keyboard cat", resave: false, saveUninitialized: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,12 +42,22 @@ app.use("/api", TagsController);
 
 app.get("/", (req, res) => {
 	res.send({
-		massage: "Hello World"
+		message: "Hello World"
 	});
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({
+        success: false,
+        message: "Internal Server Error",
+        error: err.message || "Something went wrong!"
+    });
+});
+
 //listen server
-const port = process.env.POST || 3001;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
 	console.log(`Example app listening ${port}`);
 });

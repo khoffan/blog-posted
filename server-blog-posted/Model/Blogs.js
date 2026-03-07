@@ -29,7 +29,7 @@ const Blogs = Schema(
             type: Number,
             default: 0,
         },
-        dislinke: {
+        dislike: {
             type: Number,
             default: 0,
         },

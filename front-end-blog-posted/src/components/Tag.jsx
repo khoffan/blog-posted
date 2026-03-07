@@ -1,28 +1,32 @@
+import { PropTypes } from "prop-types";
 import { useState } from "react";
 
 export default function Tag({ tagName, index, sendTags }) {
-    const [isSelected, setIsSelected] = useState(false);
+	const [selected, setSelected] = useState(false);
 
-    const toggleSelect = (e) => {
-        const newSelected = !isSelected;
-        setIsSelected(newSelected);
-        // ใช้ value จาก input
-        sendTags(e.target.value, newSelected);
-    };
+	const toggleTag = () => {
+		setSelected(!selected);
+		sendTags(tagName, !selected);
+	};
 
-    return (
-        <input
-            type="button"
-            onClick={toggleSelect}
-            data-index={index}
-            value={tagName}
-            readOnly
-            className={`cursor-pointer px-4 py-2 rounded-full border transition-all 
-            ${
-                isSelected
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-blue-500 border-blue-500"
-            }`}
-        />
-    );
+	return (
+		<button
+			onClick={toggleTag}
+			className={`
+				px-4 py-2 text-[14px] rounded-full transition-colors whitespace-nowrap
+				${selected 
+					? "bg-black text-white hover:bg-gray-800" 
+					: "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-100"
+				}
+			`}
+		>
+			{tagName}
+		</button>
+	);
 }
+
+Tag.propTypes = {
+	tagName: PropTypes.string.isRequired,
+	index: PropTypes.number,
+	sendTags: PropTypes.func.isRequired,
+};

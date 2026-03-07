@@ -1,19 +1,40 @@
-import { useLocation } from "react-router-dom";
-import DetailProfile from "../../components/profileComponents/DetailProfile";
-import Footter from "../../components/Footter";
+import { useEffect } from "react";
 import Nav from "../../components/NavbarComponents/Nav";
-export default function Profile() {
-    const location = useLocation();
-    const { user } = location.state || {};
-    console.log(user);
+import Footer from "../../components/Footer";
+import DetailProfile from "../../components/profileComponents/DetailProfile";
+import useUserStore from "../../store/useUserStore";
+import useAuthStore from "../../store/useAuthStore";
+import { useParams } from "react-router-dom";
 
-    return (
-        <>
-            <div className="h-screen w-full flex flex-col gap-4">
-                <Nav />
-                <DetailProfile userObj={user} />
-            </div>
-            <Footter />
-        </>
-    );
+export default function Profile() {
+	const { fetchProfile, profile, isLoading } = useUserStore();
+	const { user } = useAuthStore();
+	// Can get ID either from URL params (if we change routes) or the auth store
+	const userId = user?.authid; 
+
+	useEffect(() => {
+		if (userId) {
+			fetchProfile(userId);
+		}
+	}, [userId]);
+
+	return (
+		<div className="min-h-screen flex flex-col bg-white">
+			<Nav />
+			<main className="flex-grow w-full max-w-[1040px] mx-auto px-6 py-12">
+				{isLoading ? (
+					<div className="flex justify-center items-center h-40">
+						<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+					</div>
+				) : profile ? (
+					<DetailProfile userObj={profile} />
+				) : (
+					<div className="text-center py-20 text-gray-500 font-serif text-lg">
+						Profile not found.
+					</div>
+				)}
+			</main>
+			<Footer />
+		</div>
+	);
 }

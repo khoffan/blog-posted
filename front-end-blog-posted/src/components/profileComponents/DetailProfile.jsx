@@ -1,68 +1,71 @@
-import React from "react";
-import Nav from "../NavbarComponents/Nav";
-import Footter from "../Footter";
-import FeildDataProfile from "./FeildDataProfile";
 import { useNavigate } from "react-router-dom";
-export default function DetailProfile({ userObj }) {
-    const navigate = useNavigate();
-    const handleUpdateProfile = () => {
-        if (userObj == null) return;
-        navigate(`/user/editprofile/${userObj._id}`, { state: { userObj } });
-    };
+import FieldDataProfile from "./FieldDataProfile";
 
-    return (
-        <>
-            {userObj != null && (
-                <>
-                    <div className="w-full h-full flex flex-col justify-center items-center">
-                        {userObj.image_path == null ? (
-                            <img
-                                src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-                                alt="profile"
-                                className=""
-                            />
-                        ) : (
-                            <img
-                                src={`${import.meta.env.VITE_BASE_API_URI}/${
-                                    userObj.image_path
-                                }`}
-                                className="rounded-full w-[80px] h-[80px] object-cover mx-auto"
-                            />
-                        )}
-                        <div className="w-[500px] flex flex-row justify-between items-center">
-                            <button type="button">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    className="size-6 fill-blue-400 cursor-pointer"
-                                    onClick={handleUpdateProfile}
-                                >
-                                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
-                                    <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
-                                </svg>
-                                <p className="">Update</p>
-                            </button>
-                            <button type="button" className="m-[20px]">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    className="size-6 fill-red-400"
-                                >
-                                    <path d="M10.375 2.25a4.125 4.125 0 1 0 0 8.25 4.125 4.125 0 0 0 0-8.25ZM10.375 12a7.125 7.125 0 0 0-7.124 7.247.75.75 0 0 0 .363.63 13.067 13.067 0 0 0 6.761 1.873c2.472 0 4.786-.684 6.76-1.873a.75.75 0 0 0 .364-.63l.001-.12v-.002A7.125 7.125 0 0 0 10.375 12ZM16 9.75a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5h-6Z" />
-                                </svg>
-                                <p className="text-red-400">Delate</p>
-                            </button>
-                        </div>
-                        <FeildDataProfile
-                            id={userObj._id}
-                            oldData={userObj}
-                            isShow={true}
-                        />
-                    </div>
-                </>
-            )}
-        </>
-    );
+const API = import.meta.env.VITE_BASE_API_URI;
+
+export default function DetailProfile({ userObj }) {
+	const navigate = useNavigate();
+
+	const handleUpdateProfile = () => {
+		if (!userObj) return;
+		navigate(`/user/editprofile/${userObj._id}`);
+	};
+
+	if (!userObj) return null;
+
+	const displayName = userObj.first_name + " " + userObj.last_name;
+	const displayImage = userObj.image_path
+		? `${API}/${userObj.image_path}`
+		: "https://api.dicebear.com/7.x/initials/svg?seed=" + (userObj.first_name || "U");
+
+	return (
+		<div className="flex flex-col md:flex-row gap-16 font-sans">
+			{/* Left Column - User Info */}
+			<div className="w-full md:w-[680px]">
+				<div className="flex items-center justify-between mb-10">
+					<h1 className="text-[42px] font-bold tracking-tight text-gray-900">{displayName}</h1>
+					<button 
+						onClick={handleUpdateProfile}
+						className="hidden md:flex text-gray-600 hover:text-black hover:bg-gray-50 px-4 py-2 rounded-full border border-gray-300 text-sm font-medium transition-colors"
+					>
+						Edit profile
+					</button>
+				</div>
+				
+				{/* Basic Data List */}
+				<div className="mb-10 block md:hidden">
+					{/* Mobile edit button */}
+					<button 
+						onClick={handleUpdateProfile}
+						className="w-full text-center text-gray-600 hover:text-black bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-full border border-gray-200 text-sm font-medium transition-colors"
+					>
+						Edit profile
+					</button>
+				</div>
+
+				<div className="border-t border-gray-100 py-8">
+					<h3 className="text-xl font-bold mb-6 text-gray-900 font-serif">About</h3>
+					<FieldDataProfile id={userObj._id} oldData={userObj} isShow={true} />
+				</div>
+			</div>
+
+			{/* Right Column - Avatar / Settings sidebar */}
+			<div className="hidden md:flex flex-col w-[320px] shrink-0 border-l border-gray-100 pl-10 pt-4">
+				<img
+					src={displayImage}
+					alt="profile"
+					className="w-24 h-24 rounded-full object-cover mb-6 border border-gray-200"
+				/>
+				<h2 className="text-base font-bold text-gray-900 mb-2">{displayName}</h2>
+				<p className="text-sm text-gray-500 mb-6">{userObj.blogs_count || 0} Stories written</p>
+				
+				<button 
+					onClick={handleUpdateProfile}
+					className="text-green-600 hover:text-green-700 text-sm mb-4 font-medium text-left transition-colors"
+				>
+					Edit profile information
+				</button>
+			</div>
+		</div>
+	);
 }

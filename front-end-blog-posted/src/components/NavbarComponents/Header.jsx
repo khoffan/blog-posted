@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/logo-litium.png";
 import UserMenu from "./Usermenu";
 import Authbutton from "./Authbutton";
+import useBlogStore from "../../store/useBlogStore";
+import { useState } from "react";
 
 function Header({
-	sreach,
 	isCreateBlog,
 	isLogin,
 	user = {},
@@ -16,43 +17,86 @@ function Header({
 	isDropdown,
 	handleCheckLogin,
 	handleLogout,
-	handleProfileNvigate,
-	handleSreaching,
-	handletoWriteblog,
-	handletoblogpage,
-	alertMessage,
+	handleProfileNavigate,
+	handleToWriteBlog,
+	handleToBlogPage,
 	toggleSearch,
 	isSearchOpen,
-	handleSearchParams
 }) {
+	const { searchQuery, setSearchQuery } = useBlogStore();
+	const [searchInput, setSearchInput] = useState(searchQuery);
+
+	const handleSearching = (event) => {
+		setSearchInput(event.target.value);
+	};
+
+	const handleSearchParams = (event) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			const trimmed = searchInput.trim();
+			setSearchQuery(trimmed);
+			const params = new URLSearchParams();
+			params.set("search", trimmed);
+			window.location.href = `?${params.toString()}`;
+		}
+	};
+
 	return (
-		<>
-			{isCreateBlog == true && user != null ? (
-				<div className="z-[102] w-full flex flex-row items-center justify-evenly p-2 bg-red-500">
-					<div className="flex items-center gap-4">
-						<Link to="/">
-							<div className="flex items-center">
-								<img
-									src={logo}
-									alt="profile"
-									className="w-[40px] h-[40px] mx-2 bg-transparent rounded-full object-cover"
-								/>
-								<span className="text-2xl font-bold text-white">Litium</span>
+		<nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-[100]">
+			<div className="max-w-[1240px] mx-auto flex items-center justify-between px-6 py-3">
+				{/* Logo & Search Area */}
+				<div className="flex items-center gap-6">
+					<Link to="/">
+						<div className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+							{/* Using a generic crisp dot for logo if image isn't great, else use the image */}
+							<div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-serif font-bold italic text-xl leading-none">
+								L
 							</div>
-						</Link>
-						<span className="text-base text-gray-400 pt-[10px]">
-							Write by {user.first_name}
+							<span className="text-2xl font-serif font-bold tracking-tight text-gray-900 hidden sm:block">Litium</span>
+						</div>
+					</Link>
+					
+					{!isCreateBlog && (
+						<div className="hidden md:flex items-center gap-2 rounded-full bg-gray-50 border border-gray-100 hover:border-gray-300 transition-colors px-4 py-2 w-[240px] lg:w-[320px]">
+							<FontAwesomeIcon
+								icon={faMagnifyingGlass}
+								className="text-gray-400 text-sm"
+							/>
+							<input
+								className="w-full bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-0"
+								id="search"
+								name="search"
+								type="text"
+								placeholder="Search stories, topics, or authors..."
+								value={searchInput}
+								onChange={handleSearching}
+								onKeyDown={handleSearchParams}
+							/>
+						</div>
+					)}
+				</div>
+
+				{/* Navigation & Auth */}
+				<div className="flex items-center gap-4">
+					{isCreateBlog && user != null && (
+						<span className="text-sm text-gray-500 hidden sm:block mr-2">
+							Draft by {user.first_name}
 						</span>
-					</div>
+					)}
+
+					{!isCreateBlog && (
+						<button className="md:hidden p-2 text-gray-500 hover:text-black transition-colors" onClick={toggleSearch}>
+							<FontAwesomeIcon icon={faMagnifyingGlass} />
+						</button>
+					)}
 
 					{isLogin ? (
 						<UserMenu
 							handleDropdown={handleDropdown}
-							handleProfileNvigate={handleProfileNvigate}
+							handleProfileNavigate={handleProfileNavigate}
 							handleLogout={handleLogout}
-							handletoWriteblog={handletoWriteblog}
-							handletoblogpage={handletoblogpage}
-							alertMessage={alertMessage}
+							handleToWriteBlog={handleToWriteBlog}
+							handleToBlogPage={handleToBlogPage}
 							isDropdown={isDropdown}
 							isImage={isImage}
 							user={user}
@@ -63,76 +107,28 @@ function Header({
 						<Authbutton handleCheckLogin={handleCheckLogin} />
 					)}
 				</div>
-			) : (
-				<div className="z-[102] w-full flex flex-row items-center justify-between pl-[50px] pr-[80px] p-2 bg-red-500">
-					<div className="text-3xl font-bold text-white px-2 flex  justify-center items-center">
-						<Link to="/">
-							<div className="flex items-center">
-								<img
-									src={logo}
-									alt="profile"
-									className="w-[60px] h-[50px] mx-2 bg-transparent rounded-full"
-								/>
-								<span className="text-3xl font-bold text-white">Litium</span>
-							</div>
-						</Link>
-						<div className="mx-5">
-							<div className="hidden md:flex items-center gap-2 rounded-full bg-gray-100 text-base font-light px-4 py-1 focus-within:border focus-within:border-gray-500 shadow-sm transition-all">
-								{/* ไอคอนค้นหา */}
-								<FontAwesomeIcon
-									icon={faMagnifyingGlass}
-									className="text-gray-500"
-								/>
+			</div>
 
-								{/* ช่อง Input */}
-								<input
-									className="w-full bg-transparent text-sm font-light h-full py-1 px-2 focus:bg-white focus:outline-none text-gray-700 rounded-full placeholder-gray-400"
-									id="search"
-									name="search"
-									type="text"
-									placeholder="Search..."
-									value={sreach}
-									onChange={handleSreaching}
-									onKeyDown={handleSearchParams}
-								/>
-							</div>
-
-							<button className="md:hidden p-2 rounded-full" onClick={toggleSearch}>
-								<FontAwesomeIcon icon={faMagnifyingGlass} />
-							</button>
-
-							{isSearchOpen && (
-								<>
-									<input
-										className="transition-all duration-300 bg-inherite rounded-full mx-4 px-5 text-white w-1/2 py-1 px-2 text-lg outline-2 ouline-black focus:shadow-outline"
-										id="search"
-										name="search"
-										type="text"
-										placeholder="Search..."
-										value={sreach}
-										onChange={handleSreaching}
-									/>
-								</>
-							)}
-						</div>
-					</div>
-					{isLogin ? (
-						<UserMenu
-							handleDropdown={handleDropdown}
-							handleProfileNvigate={handleProfileNvigate}
-							handleLogout={handleLogout}
-							handletoWriteblog={handletoWriteblog}
-							handletoblogpage={handletoblogpage}
-							isDropdown={isDropdown}
-							isImage={isImage}
-							user={user}
+			{/* Mobile Search Expand */}
+			{!isCreateBlog && isSearchOpen && (
+				<div className="md:hidden w-full px-6 py-3 border-t border-gray-100 bg-gray-50">
+					<div className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2">
+						<FontAwesomeIcon icon={faMagnifyingGlass} className="text-gray-400" />
+						<input
+							className="w-full bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
+							id="search-mobile"
+							name="search"
+							type="text"
+							placeholder="Search..."
+							value={searchInput}
+							onChange={handleSearching}
+							onKeyDown={handleSearchParams}
+							autoFocus
 						/>
-					) : (
-						<Authbutton handleCheckLogin={handleCheckLogin} />
-					)}
+					</div>
 				</div>
 			)}
-		</>
+		</nav>
 	);
 }
 

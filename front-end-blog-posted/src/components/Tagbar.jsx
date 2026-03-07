@@ -1,47 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Tag from "./Tag";
-import axios from "axios";
+import useBlogStore from "../store/useBlogStore";
 
 export default function Tagbar({ sendTags }) {
-    const [tags, setTags] = useState(null);
+	const { allTags, fetchAllTags } = useBlogStore();
 
-    const fetchTags = async () => {
-        try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_BASE_API_URI}/api/tags`
-            );
-            setTags(
-                response.data.tags[0].tagname.map((tag) => ({
-                    tagname: tag,
-                }))
-            );
-        } catch (error) {
-            console.log(error);
-        }
-    };
-    useEffect(() => {
-        fetchTags();
-    }, []);
+	useEffect(() => {
+		fetchAllTags();
+	}, []);
 
-    return (
-        <>
-            {tags != null ? (
-                <div className="p-4 flex flex-wrap w-full gap-2 justify-start items-center">
-                    <span className="text-xl text-center font-bold">Tag:</span>
-                    {tags.map((tag, index) => (
-                        <Tag
-                            tagName={tag.tagname}
-                            key={`tag-${index}`}
-                            index={index}
-                            sendTags={sendTags}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="p-4 flex flex-wrap w-full gap-2 justify-start items-center">
-                    <span className="text-xl text-center font-bold">Tag:</span>
-                </div>
-            )}
-        </>
-    );
+	if (!allTags || allTags.length === 0) return null;
+
+	return (
+		<div className="w-full">
+			<div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
+				{/* The plus icon could go here for "Add Topic" */}
+				<div className="flex gap-2">
+					{allTags.map((tag, index) => (
+						<Tag
+							tagName={tag.tagname}
+							key={`tag-${index}`}
+							index={index}
+							sendTags={sendTags}
+						/>
+					))}
+				</div>
+			</div>
+		</div>
+	);
 }

@@ -8,10 +8,11 @@ import Login from "./pages/Auth/Login.jsx";
 import Register from "./pages/Auth/Register.jsx";
 import CreatePost from "./pages/Posts/CreatePost.jsx";
 import Profile from "./pages/userProfile/Profile.jsx";
-import ProtechRoute from "./components/protechRoute/ProtechRoute.jsx";
+import ProtectedRoute from "./components/protectedRoute/ProtectedRoute.jsx";
 import EditProfile from "./pages/userProfile/EditProfile.jsx";
 import Blogspage from "./pages/Posts/Blogspage.jsx";
 import BlogDetail from "./pages/Posts/BlogDetail.jsx";
+
 
 //server side for protect route
 
@@ -23,9 +24,9 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: (
-      <ProtechRoute redirectPath="/">
+      <ProtectedRoute redirectPath="/">
         <Login />
-      </ProtechRoute>
+      </ProtectedRoute>
 
       //<Login />
     ),
@@ -33,9 +34,9 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: (
-      <ProtechRoute redirectPath="/">
+      <ProtectedRoute redirectPath="/">
         <Register />
-      </ProtechRoute>
+      </ProtectedRoute>
 
       //<Register />
     ),
@@ -57,7 +58,7 @@ const router = createBrowserRouter([
     element: <EditProfile />,
   },
   {
-    path: "/blog/deatil/:id",
+    path: "/blog/detail/:id",
     element: <BlogDetail />,
   },
 ]);

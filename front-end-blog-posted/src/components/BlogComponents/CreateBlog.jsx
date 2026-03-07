@@ -1,400 +1,234 @@
-import { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import Nav from "../NavbarComponents/Nav";
+import React, { useState, useEffect, useRef } from "react";
+import ParagraphField from "./ParagraphField";
+import TagField from "./TagField";
+import useBlogStore from "../../store/useBlogStore";
+import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
-import TagFeold from "./TagFeold";
-import ParagraphFeild from "./ParagraphFeild";
-import { Alert } from "../Alert";
-import { PropTypes } from "prop-types";
+import Swal from "sweetalert2";
 
-export default function CreateBlog({ id }) {
-    CreateBlog.propTypes = {
-        id: PropTypes.string.isRequired,
-    };
-    const [paragraphs, setParagraphs] = useState([
-        { type: "text", content: "" },
-    ]);
-    const [activeIndex, setActiveIndex] = useState(null);
-    const [isTextnavigate, setIstextNavigate] = useState(
-        Array(paragraphs.length).fill(false)
-    );
-    const [isCreateBlog, setIscreateBlog] = useState(false);
-    const paragraphRef = useRef([]);
-    const [title, setTitle] = useState("");
-    const [blogImage, setBlogImage] = useState([]);
-    const [contents, setContents] = useState("");
-    const [tags, setTags] = useState([]);
-    const [inputTag, setInputTag] = useState("");
-    const [author, setAuthor] = useState({
-        name: "",
-        email: "",
-        image: "",
-    });
+export default function CreateBlog() {
+	const navigate = useNavigate();
+	const { createBlog, uploadBlogImage, isLoading } = useBlogStore();
+	const { user } = useAuthStore();
 
-    const navigate = useNavigate();
+	const [paragraphs, setParagraphs] = useState([{ type: "text", content: "" }]);
+	const [blogImage, setBlogImage] = useState([]); // {id, image_path}
+	const [activeIndex, setActiveIndex] = useState(0);
+	const [isTextnavigate, setIsTextnavigate] = useState([false]);
+	
+	const [inputTag, setInputTag] = useState("");
+	const [tags, setTags] = useState([]);
+	const paragraphRef = useRef([]);
 
-    useEffect(() => {
-        if (isTextnavigate.length != paragraphs.length) {
-            setIstextNavigate(Array(paragraphs.length).fill(false));
-        }
-    }, [paragraphs]);
+	useEffect(() => {
+		const storeDraft = localStorage.getItem("draftCreateBlog");
+		if (storeDraft) {
+			const parsed = JSON.parse(storeDraft);
+			setParagraphs(parsed.paragraphs || [{ type: "text", content: "" }]);
+			setBlogImage(parsed.blogImage || []);
+		}
+	}, []);
 
-    //ดึงข้อมูลจาก localstorage
-    useEffect(() => {
-        try {
-            const saveParagraphs = JSON.parse(
-                localStorage.getItem("paragraphs")
-            );
-            console.log(saveParagraphs);
+	const saveDraft = (p, bi) => {
+		localStorage.setItem("draftCreateBlog", JSON.stringify({ paragraphs: p, blogImage: bi }));
+	};
 
-            if (saveParagraphs?.paragraphs) {
-                setParagraphs(saveParagraphs.paragraphs);
-                setBlogImage(saveParagraphs.images || []);
-            } else {
-                setParagraphs([
-                    { type: "text", content: "" },
-                    { type: "text", content: "" },
-                ]);
-                setBlogImage([]);
-            }
-        } catch (error) {
-            console.log("err: ", error);
-            setParagraphs([
-                { type: "text", content: "" },
-                { type: "text", content: "" },
-            ]);
-            setBlogImage([]);
-        }
-    }, []);
+	const clearDraft = () => {
+		localStorage.removeItem("draftCreateBlog");
+	};
 
-    const fetchProfile = async () => {
-        try {
-            const response = await axios.get(
-                `${import.meta.env.VITE_BASE_API_URI}/api/profile/${id}`
-            );
-            const autherRes = response.data.profile;
-            console.log(response.data.profile);
-            setAuthor({
-                name: autherRes.first_name + " " + autherRes.last_name,
-                email: autherRes.email,
-                image: autherRes.image_path,
-            });
-        } catch (error) {
-            console.error(error);
-        }
-    };
+	const handleFocus = (index) => {
+		setActiveIndex(index);
+		const newNavState = Array(paragraphs.length).fill(false);
+		setIsTextnavigate(newNavState);
+	};
 
-    useEffect(() => {
-        fetchProfile();
-        setIscreateBlog(true);
-    }, []);
+	const handleContent = (event, index) => {
+		const newParagraph = [...paragraphs];
+		newParagraph[index].content = event.target.value;
+		setParagraphs(newParagraph);
+		
+		event.target.style.height = "auto";
+		event.target.style.height = `${event.target.scrollHeight}px`;
+		saveDraft(newParagraph, blogImage);
+	};
 
-    const handleFileUpload = async (e, index, blogid) => {
-        const file = e.target.files[0];
-        if (!file) {
-            Alert("กรุณาเลือกรูปภาพ", "warning", "top");
-            return;
-        }
-        const formData = new FormData();
-        const imageid = `img_${Date.now()}`;
-        formData.append("blogid", blogid);
-        formData.append("imageid", imageid);
-        formData.append("blog", file);
-        try {
-            const newParagraphs = [...paragraphs];
-            const response = await axios.post(
-                `${import.meta.env.VITE_BASE_API_URI}/api/blog/images`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                    withCredentials: true,
-                }
-            );
+	const handleKeydown = (event, index) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			const newParagraph = [...paragraphs];
+			newParagraph.splice(index + 1, 0, { type: "text", content: "" });
+			setParagraphs(newParagraph);
+			saveDraft(newParagraph, blogImage);
 
-            const file_path = response.data.file.path;
-            const file_name = response.data.file.filename;
-            if (response.status === 200) {
-                setBlogImage((prev) => [
-                    ...prev,
-                    {
-                        id: imageid,
-                        image_path: file_path,
-                        image_name: file_name,
-                    },
-                ]);
-                newParagraphs[index] = {
-                    type: "image",
-                    content: imageid,
-                };
-                newParagraphs.splice(index + 1, 0, {
-                    type: "text",
-                    content: "",
-                }); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
-                setParagraphs(newParagraphs);
-                localStorage.setItem(
-                    "paragraphs",
-                    JSON.stringify({
-                        paragraphs: newParagraphs,
-                        images: [
-                            ...blogImage,
-                            { id: imageid, image_path: file_path },
-                        ],
-                    })
-                );
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
+			setTimeout(() => {
+				if (paragraphRef.current[index + 1]) {
+					paragraphRef.current[index + 1].focus();
+				}
+			}, 0);
+		} else if (event.key === "Backspace" && paragraphs[index].content === "" && paragraphs.length > 1) {
+			event.preventDefault();
+			const newParagraph = [...paragraphs];
+			newParagraph.splice(index, 1);
+			setParagraphs(newParagraph);
+			saveDraft(newParagraph, blogImage);
 
-    const handleKeydown = (event, index) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
+			setTimeout(() => {
+				if (paragraphRef.current[index - 1]) {
+					paragraphRef.current[index - 1].focus();
+					setActiveIndex(index - 1);
+				}
+			}, 0);
+		}
+	};
 
-            const newParagraphs = [...paragraphs];
-            newParagraphs.splice(index + 1, 0, { type: "text", content: "" }); // เพิ่ม textarea ใหม่เป็นค่าพื้นฐาน (ข้อความว่าง)
-            setParagraphs(newParagraphs);
-            setActiveIndex(index + 1);
+	const handleNavatebutton = (index) => {
+		const newNavState = [...isTextnavigate];
+		newNavState[index] = !newNavState[index];
+		setIsTextnavigate(newNavState);
+	};
 
-            requestAnimationFrame(() => {
-                if (paragraphRef.current[newParagraphs.length - 1]) {
-                    paragraphRef.current[newParagraphs.length - 1].focus();
-                }
-            }, 0);
-        }
-        if (event.key === "Backspace") {
-            const currentParagraph = paragraphs[index];
-            if (
-                (currentParagraph.type === "text" &&
-                    currentParagraph.content === "") ||
-                currentParagraph.type === "image"
-            ) {
-                if (paragraphs.length > 1) {
-                    event.preventDefault();
-                    const newParagraphs = [...paragraphs];
-                    newParagraphs.splice(index, 1);
-                    setParagraphs(newParagraphs);
-                    localStorage.setItem(
-                        "paragraphs",
-                        JSON.stringify(newParagraphs)
-                    );
+	const handleFileUpload = async (e, index) => {
+		const file = e.target.files[0];
+		if (!file) return;
 
-                    const newIndex = index > 0 ? index - 1 : 0;
-                    setActiveIndex(newIndex);
+		const uploadedPath = await uploadBlogImage(file);
+		if (uploadedPath) {
+			const newId = `image-${Date.now()}`;
+			const newBlogImages = [...blogImage, { id: newId, image_path: uploadedPath }];
+			setBlogImage(newBlogImages);
 
-                    requestAnimationFrame(() => {
-                        if (paragraphRef.current[newIndex]) {
-                            paragraphRef.current[newIndex].focus();
-                        }
-                    }, 0);
-                }
-            }
-        }
+			const newParagraph = [...paragraphs];
+			newParagraph[index] = { type: "image", content: newId };
+			newParagraph.splice(index + 1, 0, { type: "text", content: "" });
+			setParagraphs(newParagraph);
+			
+			const newNavState = Array(newParagraph.length).fill(false);
+			setIsTextnavigate(newNavState);
+			saveDraft(newParagraph, newBlogImages);
+			
+			setTimeout(() => {
+				if (paragraphRef.current[index + 1]) {
+					paragraphRef.current[index + 1].focus();
+				}
+			}, 0);
+		}
+	};
 
-        // ลบรูปภาพเมื่อกด Delete
-        if (event.key === "Delete" && paragraphs[index].type === "image") {
-            handleDeleteImage(index);
-        }
-    };
+	const handleDeleteImage = (index) => {
+		const newParagraph = [...paragraphs];
+		const imageId = newParagraph[index].content;
+		newParagraph.splice(index, 1);
+		
+		const newBlogImages = blogImage.filter(img => img.id !== imageId);
+		
+		if (newParagraph.length === 0) {
+			newParagraph.push({ type: "text", content: "" });
+		}
+		
+		setParagraphs(newParagraph);
+		setBlogImage(newBlogImages);
+		saveDraft(newParagraph, newBlogImages);
+	};
 
-    const handleContent = (event, index) => {
-        const newparagraphs = [...paragraphs];
-        newparagraphs[index] = {
-            type: "text",
-            content: event.target.value,
-        };
-        setParagraphs(newparagraphs);
-        localStorage.setItem(
-            "paragraphs",
-            JSON.stringify({
-                paragraphs: newparagraphs,
-                images: [...blogImage],
-            })
-        );
-    };
+	const handleInputChange = (e) => setInputTag(e.target.value);
 
-    //const handleChangeDescription = (event) => {
-    //	setDescription(event.target.value);
-    //};
-    const handleFocus = (index) => {
-        setActiveIndex(index);
-        setIstextNavigate((prevSate) =>
-            prevSate.map((state, i) => (i === index ? false : null))
-        );
-        // เมื่อมีการโฟกัสที่ <p> จะตรวจสอบตำแหน่งของ cursor
-    };
+	const handleTagInputKey = (e) => {
+		if (e.key === "Enter" && inputTag.trim() !== "") {
+			e.preventDefault();
+			if (!tags.includes(inputTag.trim())) {
+				setTags([...tags, inputTag.trim()]);
+			}
+			setInputTag("");
+		}
+	};
 
-    const handleNavatebutton = (index) => {
-        setIstextNavigate((prevState) =>
-            prevState.map((state, i) => (i === index ? !state : state))
-        );
-    };
+	const handleCloseTag = (tagToRemove) => {
+		setTags(tags.filter(tag => tag !== tagToRemove));
+	};
 
-    const handleInputChange = (e) => {
-        setInputTag(e.target.value);
-    };
+	const handleUploadBlog = async () => {
+		if (paragraphs.length === 0 || !paragraphs[0].content) {
+			Swal.fire("Error", "Title cannot be empty.", "error");
+			return;
+		}
 
-    const handleDeleteImage = (index) => {
-        const imageid = paragraphs[index].content;
-        const newImage = blogImage.filter((img) => img.id !== imageid);
-        setBlogImage(newImage);
+		if (!user) {
+			Swal.fire("Error", "You must be logged in to publish.", "error");
+			return;
+		}
 
-        const newParagraphs = [...paragraphs];
-        newParagraphs.splice(index, 1);
-        if (newParagraphs.length === 0) {
-            newParagraphs.push({ type: "text", content: "" });
-        }
-        setParagraphs(newParagraphs);
-        localStorage.setItem(
-            "paragraphs",
-            JSON.stringify({
-                paragraphs: newParagraphs,
-                images: newImage,
-            })
-        );
-    };
+		const title = paragraphs[0].content;
+		const description = paragraphs.length > 1 && paragraphs[1].type === "text" 
+			? paragraphs[1].content.substring(0, 150) + "..."
+			: "";
 
-    const handleTagInputKey = (e) => {
-        if (e.key === "Enter") {
-            setInputTag("");
-            const triminput = inputTag.trim();
-            if (triminput && !tags.includes(inputTag)) {
-                setTags([...tags, inputTag]);
-                localStorage.setItem(
-                    "tags",
-                    JSON.stringify([...tags, triminput])
-                );
-            } else if (!tags.includes(inputTag)) {
-                Alert("tag นี้มีอยู่ในรายการแล้ว", "warning", "top");
-            } else {
-                Alert("กรุณากรอก tag", "warning", "top");
-            }
-        }
-    };
+		const blogData = {
+			title,
+			description,
+			tags,
+			paragraphs,
+			imagePath: blogImage,
+			userId: user._id,
+			name: user.first_name + " " + user.last_name,
+			userImage: user.image_path || ""
+		};
 
-    const handleCloseTag = (tag) => {
-        const updatedTags = tags.filter((t) => t !== tag);
-        setTags(updatedTags);
-        localStorage.setItem("tags", JSON.stringify(updatedTags));
-    };
+		const result = await createBlog(blogData);
+		if (result.success) {
+			clearDraft();
+			Swal.fire("Published!", "Your story is live.", "success").then(() => {
+				navigate("/");
+			});
+		} else {
+			Swal.fire("Error", "Failed to publish story.", "error");
+		}
+	};
 
-    useEffect(() => {
-        if (paragraphs.length >= 1) {
-            let header = paragraphs[0].content;
-            let result = paragraphs
-                .slice(1)
-                .map((p) => {
-                    if (p.type === "text") {
-                        return p.content;
-                    } else if (p.type === "image") {
-                        return `[image:${p.content}]`;
-                    }
-                    return "";
-                })
-                .join("\n");
-            setTitle(header);
-            setContents(result);
-        }
-    }, [paragraphs]);
+	return (
+		<div className="max-w-[800px] mx-auto px-6 py-12">
+			{/* Publish Header */}
+			<div className="flex justify-between items-center mb-10 pb-4 border-b border-gray-100">
+				<div className="flex items-center gap-3">
+					<span className="text-gray-400 font-sans">Draft</span>
+					<span className="text-sm font-medium text-gray-500">Saved</span>
+				</div>
+				<button 
+					onClick={handleUploadBlog}
+					disabled={isLoading}
+					className="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-1.5 rounded-full transition-colors disabled:opacity-50 shadow-sm"
+				>
+					{isLoading ? "Publishing..." : "Publish"}
+				</button>
+			</div>
 
-    const handleSubmitBlog = async (event) => {
-        event.preventDefault();
-        try {
-            if (title === "" || contents === "" || author === null) {
-                Alert("Please fill all the fields", "warning", "top");
-                return;
-            }
+			{/* Main Editor Area */}
+			<div className="w-full">
+				<ParagraphField
+					paragraphs={paragraphs}
+					handleContent={handleContent}
+					activeIndex={activeIndex}
+					paragraphRef={paragraphRef}
+					handleKeydown={handleKeydown}
+					handleFocus={handleFocus}
+					isTextnavigate={isTextnavigate}
+					handleNavatebutton={handleNavatebutton}
+					handleFileUpload={handleFileUpload}
+					handleDeleteImage={handleDeleteImage}
+					blogImage={blogImage}
+				/>
 
-            const response = await axios.post(
-                `${import.meta.env.VITE_BASE_API_URI}/api/creatBlogs`,
-                {
-                    title: title,
-                    description: contents,
-                    author,
-                    blogImage: blogImage,
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true,
-                }
-            );
-            if (response.status === 201) {
-                localStorage.removeItem("paragraphs");
-                setTitle("");
-                setContents("");
-                setParagraphs([]);
-                await new Promise((resolve) => setTimeout(resolve, 500));
-                for (let i = 0; i < tags.length; i++) {
-                    await axios.post(
-                        `${import.meta.env.VITE_BASE_API_URI}/api/tags`,
-                        {
-                            blogid: response.data.blog._id,
-                            tagname: tags[i],
-                        },
-                        {
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            withCredentials: true,
-                        }
-                    );
-                }
-                setTags([]);
-                localStorage.removeItem("tags");
-                navigate("/");
-                Alert("บันทึกสําเร็จ", "success", "top", false);
-                // alertMessage("บันทึกสําเร็จ", "success");
-            } else {
-                alert("ไม่สามารถ publish blog ได้");
-            }
-        } catch (error) {
-            alert("ไม่สามารถ publish blog ได้");
-            console.log(error);
-        }
-    };
-
-    useEffect(() => {
-        const localTags = localStorage.getItem("tags");
-        if (localTags) {
-            setTags(JSON.parse(localTags));
-        }
-    }, []);
-
-    return (
-        <>
-            <div className="w-full flex flex-col items-center justify-center gap-4 ">
-                <Nav
-                    isCreateBlog={isCreateBlog}
-                    publicState={handleSubmitBlog}
-                />
-                <ParagraphFeild
-                    paragraphs={paragraphs}
-                    handleContent={handleContent}
-                    activeIndex={activeIndex}
-                    paragraphRef={paragraphRef}
-                    handleKeydown={handleKeydown}
-                    handleFocus={handleFocus}
-                    isTextnavigate={isTextnavigate}
-                    handleNavatebutton={handleNavatebutton}
-                    handleFileUpload={handleFileUpload}
-                    handleDeleteImage={handleDeleteImage}
-                    blogImage={blogImage}
-                />
-
-                <TagFeold
-                    handleInputChange={handleInputChange}
-                    handleTagInputKey={handleTagInputKey}
-                    inputTag={inputTag}
-                    tags={tags}
-                    handleCloseTag={handleCloseTag}
-                />
-                <div className="w-full h-10"></div>
-                {/* เพิ่มของ blog */}
-            </div>
-        </>
-    );
+				{/* Tag Editor */}
+				<div className="mt-16 pt-8 border-t border-gray-100">
+					<TagField
+						tags={tags}
+						inputTag={inputTag}
+						handleInputChange={handleInputChange}
+						handleTagInputKey={handleTagInputKey}
+						handleCloseTag={handleCloseTag}
+					/>
+				</div>
+			</div>
+		</div>
+	);
 }

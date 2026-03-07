@@ -1,110 +1,113 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useMemo } from "react";
 import Blog from "./Blog.jsx";
-
 import Sidebar from "../Sidebar.jsx";
 import Tagbar from "../Tagbar.jsx";
 import { useNavigate } from "react-router-dom";
-import Loading from "../Loading.jsx";
+import useBlogStore from "../../store/useBlogStore.js";
 
-function Home({ search }) {
-	const [content, setContent] = useState([]);
-	const [isLoading, setIsloading] = useState(false);
-	const [tags, setTags] = useState([]);
+// Custom lightweight skeleton loader
+const SkeletonBlock = () => (
+	<div className="animate-pulse flex flex-col md:flex-row gap-6 py-8 border-b border-gray-100">
+		<div className="flex-1 flex flex-col gap-3">
+			<div className="flex items-center gap-2">
+				<div className="h-6 w-6 rounded-full bg-gray-200"></div>
+				<div className="h-4 w-24 bg-gray-200 rounded"></div>
+			</div>
+			<div className="h-6 w-3/4 bg-gray-200 rounded mt-2"></div>
+			<div className="h-4 w-full bg-gray-200 rounded"></div>
+			<div className="h-4 w-5/6 bg-gray-200 rounded"></div>
+		</div>
+		<div className="w-full md:w-[160px] h-[100px] bg-gray-200 rounded-sm"></div>
+	</div>
+);
+
+function Content() {
+	const { blogs, isLoading, fetchBlogs, selectedTags, searchQuery } = useBlogStore();
+	const [localLoading, setLocalLoading] = useState(false);
 	const navigate = useNavigate();
-	//console.log(token);
 
 	const handleTagsChild = (data, selected) => {
+		const { addSelectedTag, removeSelectedTag } = useBlogStore.getState();
 		if (!selected) {
-			setTags((prev) => {
-				// ลบ tag ที่ตรงกับค่าที่ส่งมา
-				return prev.filter((tag) => tag !== data);
-			});
+			removeSelectedTag(data);
 		} else {
-			setTags((prev) => {
-				// ตรวจสอบว่ามี tag นี้อยู่แล้วหรือไม่
-				return prev.includes(data) ? prev : [...prev, data];
-			});
+			addSelectedTag(data);
 		}
 	};
 
 	const getData = async () => {
-		setIsloading(true);
-		try {
-			const response = await axios.get(`${import.meta.env.VITE_BASE_API_URI}/api/blogs`, {
-				params: {
-					search: search
-				},
-				withCredentials: true
-			});
-			if (response.data.blog != undefined) {
-				setIsloading(false);
-			}
-			setContent(response.data.blogs);
-		} catch (error) {
-			console.log(error);
-		} finally {
-			setTimeout(() => {
-				setIsloading(false);
-			}, 1000);
-		}
+		setLocalLoading(true);
+		await fetchBlogs(searchQuery);
+		setTimeout(() => setLocalLoading(false), 500);
 	};
 
-	console.log(tags);
-
-	const blogDeatil = (id) => {
-		navigate(`/blog/deatil/${id}`);
-		return false;
+	const blogDetail = (id) => {
+		navigate(`/blog/detail/${id}`);
 	};
+
+	const filteredContent = useMemo(() => {
+		if (!selectedTags || selectedTags.length === 0) return blogs;
+		return blogs?.filter((blog) => {
+			return blog.tag?.some((t) => selectedTags.includes(t.tagname));
+		});
+	}, [blogs, selectedTags]);
 
 	useEffect(() => {
 		getData();
-	}, [search]);
+	}, [searchQuery]);
+
+	const showLoading = isLoading || localLoading;
 
 	return (
-		<>
-			{isLoading == false ? (
-				<>
-					<div className="flex flex-row w-full h-full gap-2 justify-center ">
-						<div className="w-full px-8 overflow-auto h-full md: px-8 w-full overflow-auto h-screen">
-							{content?.length > 0 ? (
-								<>
-									<Tagbar sendTags={handleTagsChild} />
-									{content?.map((blog) => {
-										return (
-											<>
-												<button
-													key={blog._id}
-													className="w-full md:w-3/4 block p-2 mx-auto max-w-[830px]"
-													onClick={() => blogDeatil(blog._id)}
-												>
-													<Blog
-														name={blog.author.name}
-														title={blog.title}
-														creatDate={blog.createdAt}
-														imageUrl={blog.author.image}
-														tags={blog.tag}
-														isUser={false}
-													/>
-												</button>
-											</>
-										);
-									})}
-								</>
-							) : (
-								<div className="w-full h-full flex flex-col justify-center items-center">
-									<div className="text-2xl">No Blog Found</div>
-								</div>
-							)}
-						</div>
-						<Sidebar />
+		<div className="flex flex-col lg:flex-row gap-12 w-full">
+			{/* Main Feed */}
+			<div className="flex-1 w-full lg:max-w-[680px]">
+				
+				<div className="pb-6 border-b border-gray-100 sticky top-16 bg-white z-10 pt-4 hidden sm:block">
+					<Tagbar sendTags={handleTagsChild} />
+				</div>
+
+				{showLoading ? (
+					<div className="flex flex-col mt-4">
+						<SkeletonBlock />
+						<SkeletonBlock />
+						<SkeletonBlock />
 					</div>
-				</>
-			) : (
-				<Loading />
-			)}
-		</>
+				) : filteredContent?.length > 0 ? (
+					<div className="flex flex-col divide-y divide-gray-100">
+						{filteredContent.map((blog) => (
+							<button
+								key={blog._id}
+								className="w-full text-left group hover:bg-gray-50 transition-colors -mx-4 px-4 rounded-xl"
+								onClick={() => blogDetail(blog._id)}
+							>
+								<Blog
+									index={blog._id}
+									name={blog.author.name}
+									title={blog.title}
+									content={blog.description || "No preview available for this story. Click to read more..."}
+									creatDate={blog.createdAt}
+									imageUrl={blog.author.image}
+									tags={blog.tag}
+									isUser={false}
+									thumbnail={blog.blog_image?.[0]?.image_path}
+								/>
+							</button>
+						))}
+					</div>
+				) : (
+					<div className="py-20 text-center">
+						<p className="text-gray-500 text-lg font-serif">We couldn't find any stories matching your search.</p>
+					</div>
+				)}
+			</div>
+
+			{/* Sidebar Component placed on the right */}
+			<div className="hidden lg:block w-[320px] sticky top-24 h-fit border-l border-gray-100 pl-10">
+				<Sidebar />
+			</div>
+		</div>
 	);
 }
 
-export default Home;
+export default Content;

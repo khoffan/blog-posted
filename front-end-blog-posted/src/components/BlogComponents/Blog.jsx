@@ -1,118 +1,94 @@
-import PropTypes from "prop-types";
+import { PropTypes } from "prop-types";
+import { format } from "date-fns";
+
+const API = import.meta.env.VITE_BASE_API_URI;
 
 export default function Blog({
-    index,
-    imageUrl,
-    name,
-    title,
-    creatDate,
-    isUser,
-    tags = [],
+	index,
+	name,
+	title,
+	content,
+	creatDate,
+	imageUrl,
+	isUser,
+	thumbnail,
 }) {
-    Blog.propTypes = {
-        index: PropTypes.number,
-        imageUrl: PropTypes.string,
-        name: PropTypes.string,
-        title: PropTypes.string,
-        creatDate: PropTypes.string,
-        isUser: PropTypes.bool,
-        tags: PropTypes.array,
-    };
-    const date = new Date(creatDate);
-    const options = {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-    };
-    const formatDate = date.toLocaleDateString("en-US", options);
+	Blog.propTypes = {
+		index: PropTypes.string,
+		name: PropTypes.string,
+		title: PropTypes.string,
+		content: PropTypes.string, // Passed from Description mostly
+		creatDate: PropTypes.string,
+		imageUrl: PropTypes.string,
+		isUser: PropTypes.bool,
+		thumbnail: PropTypes.string,
+	};
 
-    // const truncateText = (text, wordLimit) => {
-    // 	if (text.length > wordLimit) {
-    // 		return text.substring(0, wordLimit) + "...";
-    // 	}
-    // 	return text;
-    // };
-    // let contenttrim = truncateText(content, 40);
-    return (
-        <>
-            {isUser == false ? (
-                <div className="z-10 w-full h-auto border border-gray-300 rounded-md p-3 my-2 shadow-md hover:shadow-lg hover:bg-gray-100">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-2 md:p-[10px] space-y-4 md:space-y-0">
-                        <div className="flex flex-col gap-4 items-start w-full md:w-2/3">
-                            <h1 className="text-start text-xl md:text-3xl">
-                                {title}
-                            </h1>
-                            <div className="flex flex-row flex-wrap items-center gap-2">
-                                {tags.map((tag, index) => (
-                                    <span
-                                        key={index}
-                                        className="text-xs md:text-sm py-1 px-2 md:px-4 border border-gray-600 text-black rounded-lg"
-                                    >
-                                        {tag.tagname}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="w-full md:w-auto">
-                            <div className="flex flex-row items-center gap-2 md:gap-4">
-                                <img
-                                    src={`${
-                                        import.meta.env.VITE_BASE_API_URI
-                                    }/${imageUrl}`}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-full object-cover"
-                                    alt={name}
-                                />
-                                <div>
-                                    <p className="text-sm md:text-base font-bold">
-                                        {name}
-                                    </p>
-                                    <p className="text-[10px] font-thin">
-                                        {formatDate}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div
-                    key={index}
-                    className="w-1/2 p-4 mx-auto border border-gray-300 rounded-md showdow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
-                >
-                    <div className="flex flex-row gap-4 items-center justify-between my-4">
-                        <div className="flex flex-row items-center justify-between gap-2">
-                            <div>
-                                <h1 className="text-start text-3xl">{title}</h1>
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-end">
-                            <div className="flex flex-row items-center">
-                                <img
-                                    src={`${
-                                        import.meta.env.VITE_BASE_API_URI
-                                    }/${imageUrl}`}
-                                    width={30}
-                                    className="rounded-full object-cover"
-                                />
-                                <p className="text-base font-bold">{name}</p>
-                            </div>
-                            <div>
-                                <p className="text-[15px]">{formatDate}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex flex-row gap-4 justify-end mx-5 p-2">
-                        <button className="p-2 bg-blue-500 w-32 rounded-lg">
-                            Edit
-                        </button>
-                        <button className="p-2 bg-red-500 w-32 rounded-lg">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+	const formattedDate = creatDate 
+		? format(new Date(creatDate), "MMM d, yyyy") 
+		: "Unknown date";
+		
+	const displayAvatar = imageUrl 
+		? `${API}/${imageUrl}` 
+		: "https://api.dicebear.com/7.x/initials/svg?seed=" + (name || "U");
+
+	return (
+		<article className="py-8 flex flex-col md:flex-row gap-8 items-start justify-between cursor-pointer w-full">
+			
+			{/* Left Content Area */}
+			<div className="flex-1 min-w-0 pr-4 flex flex-col h-full w-full">
+				
+				{/* Author Meta */}
+				<div className="flex items-center gap-2 mb-3">
+					<img
+						className="w-6 h-6 rounded-full object-cover border border-gray-100"
+						src={displayAvatar}
+						alt={name}
+					/>
+					<span className="text-sm text-gray-900 font-medium truncate">{name}</span>
+					<span className="text-sm text-gray-500 hidden sm:inline">in</span>
+					<span className="text-sm text-gray-900 font-medium hidden sm:inline">Programming</span> {/* Mock topic for design */}
+				</div>
+				
+				{/* Title & Excerpt */}
+				<h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 leading-tight mb-2 group-hover:text-black line-clamp-2">
+					{title}
+				</h2>
+				<p className="hidden sm:block text-gray-600 font-serif leading-relaxed line-clamp-2 mb-4">
+					{content || "No preview description available. Click to read the full story on Litium."}
+				</p>
+				
+				{/* Footer Meta (Date, Read Time) */}
+				<div className="flex items-center gap-4 mt-auto pt-2">
+					<span className="text-[13px] text-gray-500">{formattedDate}</span>
+					<div className="w-1 h-1 rounded-full bg-gray-300 hidden sm:block"></div>
+					<span className="text-[13px] text-gray-500 hidden sm:block">4 min read</span>
+					
+					{/* Status Tag for User Dashboard */}
+					{isUser && (
+						<span className="ml-auto text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-medium">
+							Published
+						</span>
+					)}
+				</div>
+			</div>
+
+			{/* Right Thumbnail Image Area (Medium style) */}
+			{thumbnail ? (
+				<div className="w-full md:w-[160px] h-[160px] md:h-[108px] shrink-0 overflow-hidden sm:mt-8 md:mt-0">
+					<img 
+						src={`${API}/${thumbnail}`} 
+						alt={title}
+						className="w-full h-full object-cover rounded-sm border border-gray-100 hidden sm:block"
+					/>
+				</div>
+			) : (
+				// Fallback generic pattern if no thumbnail
+				<div className="hidden sm:block w-[160px] h-[108px] shrink-0 bg-gray-50 border border-gray-100 rounded-sm">
+					<div className="w-full h-full opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiPjwvcGF0aD4KPC9zdmc+')]"></div>
+				</div>
+			)}
+			
+		</article>
+	);
 }

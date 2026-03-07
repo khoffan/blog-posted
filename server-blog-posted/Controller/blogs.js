@@ -3,7 +3,7 @@ const router = express.Router();
 
 const Blogs = require("../Model/Blogs");
 const Profiles = require("../Model/Profile");
-const veriflyAuth = require("../middleware/veriflyAuth");
+const verifyAuth = require("../middleware/verifyAuth");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -19,12 +19,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // blogs api
-router.post("/creatBlogs", veriflyAuth, async (req, res) => {
+router.post("/creatBlogs", verifyAuth, async (req, res) => {
 	try {
 		const { title, description, author, blogImage } = req.body;
 		if (!(title && description && author)) {
 			return res.status(400).send({
-				massage: "All input is required"
+				message: "All input is required"
 			});
 		}
 		const blog = new Blogs({
@@ -45,7 +45,7 @@ router.post("/creatBlogs", veriflyAuth, async (req, res) => {
 		});
 		if (!blog_author) {
 			return res.status(400).send({
-				massage: "Blog not found"
+				message: "Blog not found"
 			});
 		}
 		await Profiles.findOneAndUpdate(
@@ -56,40 +56,47 @@ router.post("/creatBlogs", veriflyAuth, async (req, res) => {
 		);
 		//return false;
 		return res.status(201).send({
-			massage: "Blog created successfully",
+			message: "Blog created successfully",
 			blog
 		});
 	} catch (error) {
 		return res.status(401).send({
-			massage: "creat blogs unsuccess",
+			message: "creat blogs unsuccess",
 			error
 		});
 	}
 });
 
-router.put("/updateblog/:id", veriflyAuth, async (req, res) => {
+router.put("/updateblog/:id", verifyAuth, async (req, res) => {
 	try {
+		const { id } = req.params;
 		const { title, description, author } = req.body;
 		if (!(title && description && author)) {
 			return res.status(400).send({
-				massage: "All input is required"
+				message: "All input is required"
 			});
 		}
-		const blog = new Blogs({
-			title,
-			description,
-			author
-		});
-		blog.save();
-		//return false;
-		return res.status(201).send({
-			massage: "Blog created successfully",
+		
+		const blog = await Blogs.findByIdAndUpdate(
+			id,
+			{ title, description, author },
+			{ new: true }
+		);
+
+		if (!blog) {
+			return res.status(404).send({
+				message: "Blog not found"
+			});
+		}
+
+		return res.status(200).send({
+			message: "Blog updated successfully",
 			blog
 		});
 	} catch (error) {
-		return res.status(401).send({
-			massage: "creat blogs unsuccess",
-			error
+		return res.status(500).send({
+			message: "Update blog unsuccessful",
+			error: error.message || error
 		});
 	}
 });
@@ -130,7 +137,7 @@ router.get("/blogs", async (req, res) => {
 		});
 	} catch (error) {
 		return res.status(401).send({
-			massage: "get blogs unsuccess",
+			message: "get blogs unsuccess",
 			error: error.massage
 		});
 	}
@@ -194,7 +201,7 @@ router.put("/blog/like/:id", async (req, res) => {
 			});
 		}
 		blog.like = blog.like + 1;
-		blog.save();
+		await blog.save();
 		return res.status(200).send({
 			message: "like blog success",
 			blog
@@ -202,7 +209,7 @@ router.put("/blog/like/:id", async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		return res.status(401).send({
-			massage: "like blog unsuccess",
+			message: "like blog unsuccess",
 			error
 		});
 	}
@@ -216,8 +223,8 @@ router.put("/blog/dislike/:id", async (req, res) => {
 				message: "Blog not found"
 			});
 		}
-		blog.dislinke = blog.dislinke + 1;
-		blog.save();
+		blog.dislike = (blog.dislike || 0) + 1;
+		await blog.save();
 		return res.status(200).send({
 			message: "like blog success",
 			blog
@@ -225,13 +232,13 @@ router.put("/blog/dislike/:id", async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		return res.status(401).send({
-			massage: "like blog unsuccess",
+			message: "like blog unsuccess",
 			error
 		});
 	}
 });
 
-router.post("/blog/images", upload.single("blog"), veriflyAuth, async (req, res) => {
+router.post("/blog/images", upload.single("blog"), verifyAuth, async (req, res) => {
 	try {
 		const file = req.file;
 
@@ -249,7 +256,7 @@ router.post("/blog/images", upload.single("blog"), veriflyAuth, async (req, res)
 	} catch (error) {
 		console.log(error);
 		return res.status(401).send({
-			massage: "upload images unsuccess",
+			message: "upload images unsuccess",
 			error
 		});
 	}

@@ -1,23 +1,20 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Nav from "../NavbarComponents/Nav";
-import Footter from "../Footter";
-import FeildDataProfile from "./FeildDataProfile";
-export default function UpdateProfileDetail({ id, oldData }) {
-    return (
-        <>
-            <div className="w-full h-full">
-                <Nav />
+import React from "react";
+import FieldDataProfile from "./FieldDataProfile";
 
-                <div className="w-full h-full my-2">
-                    <FeildDataProfile
-                        id={id}
-                        oldData={oldData}
-                        isUpdate={true}
-                    />
-                </div>
-                <Footter />
-            </div>
-        </>
-    );
+export default function UpdateProfileDetail({ id, oldData }) {
+	return (
+		<div className="w-full font-sans">
+			<h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-8 font-serif">
+				Edit Profile
+			</h1>
+			
+			<div className="bg-white border text-left border-gray-100 rounded-2xl shadow-sm p-8">
+				<FieldDataProfile
+					id={id}
+					oldData={oldData}
+					isUpdate={true}
+				/>
+			</div>
+		</div>
+	);
 }
