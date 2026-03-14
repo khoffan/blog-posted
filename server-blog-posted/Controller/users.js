@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Profiles = require("../Model/Profile");
-const Users = require("../Model/Users");
 const verifyAuth = require("../middleware/verifyAuth");
-const jwt = require("jsonwebtoken");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -19,205 +17,194 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Get current user's profile (using Firebase UID)
 router.get("/user", verifyAuth, async (req, res) => {
     try {
-        const userToken = req.user;
-        const userid = userToken.user_id;
-        if (userid == null || userid == "") {
-            return res.status(400).send({
-                message: "ไม่มี email นี้ในระบบ",
-                isUser: false,
+        const { uid } = req.user;
+
+        const user = await Profiles.findOne({ authid: uid });
+        if (!user) {
+            return res.status(404).json({
+                message: "Profile not found",
+                auth: false,
             });
         }
-        const user = await Profiles.findOne({ authid: userid });
-        if (user == null || user == "" || user == undefined) {
-            return res.status(400).send({
-                message: "ไม่มีผู้ใช้รายนี้",
-                isUser: false,
-            });
-        }
-        return res.status(200).send({
+
+        return res.status(200).json({
             message: "User profile",
             user,
             auth: true,
         });
     } catch (error) {
-        console.log(error);
-        return res.send({
-            message: "Authentication failed",
-            error: error.massage,
+        console.error("GET /user Error:", error);
+        return res.status(500).json({
+            message: "Failed to fetch user profile",
+            error: error.message,
         });
     }
 });
 
+// Get profile by query (authenticated)
 router.get("/profile", verifyAuth, async (req, res) => {
     try {
         const email = req.body;
-        if (email == null || email == "") {
-            return res.status(400).send({
+        if (!email) {
+            return res.status(400).json({
                 message: "กรุณากรอกข้อมูลให้ครบถ้วน",
                 isprofile: false,
             });
         }
         const profile = await Profiles.findOne(email);
-        if (profile == null || profile == "" || profile == undefined) {
-            return res.status(400).send({
-                message: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        if (!profile) {
+            return res.status(404).json({
+                message: "Profile not found",
                 isprofile: false,
             });
         }
-        return res.status(200).send({
+        return res.status(200).json({
             message: "User profile",
             profile,
             auth: true,
         });
     } catch (error) {
-        console.log(error);
-        res.status(403).send({
-            message: "Authentication failed",
-            error: error.massage,
+        console.error("GET /profile Error:", error);
+        return res.status(500).json({
+            message: "Failed to fetch profile",
+            error: error.message,
         });
     }
 });
+
+// Create profile (authenticated)
 router.post("/creatprofile", verifyAuth, async (req, res) => {
     try {
-        const { first_name, last_name, email, phone, address, authid } =
-            req.body;
-        if ({ first_name, last_name, email, phone, address } == null) {
-            return res.status(400).send({
+        const { first_name, last_name, email, phone, address } = req.body;
+        const { uid } = req.user;
+
+        if (!first_name || !last_name || !email) {
+            return res.status(400).json({
                 message: "กรุณากรอกข้อมูลให้ครบถ้วน",
                 isprofile: false,
             });
         }
+
         const profile = new Profiles({
             first_name,
             last_name,
             email,
-            phone,
-            address,
-            blog_count: 0,
-            authid,
+            phone_nuumber: phone || "",
+            address: address || "",
+            blogs_count: 0,
+            authid: uid,
         });
-        profile.save();
-        return res.status(201).send({
-            message: "profile created successfully",
+
+        await profile.save();
+
+        return res.status(201).json({
+            message: "Profile created successfully",
             profile,
             isprofile: true,
         });
     } catch (error) {
-        console.log(error);
-        return res.status(403).send({
-            message: "Authentication failed",
-            error: error.massage,
+        console.error("POST /creatprofile Error:", error);
+        return res.status(500).json({
+            message: "Failed to create profile",
+            error: error.message,
         });
     }
 });
 
-//get one profile user
+// Get one profile by authid (public)
 router.get("/profile/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const profile = await Profiles.findOne({ authid: id });
-        if (profile == null || profile == undefined) {
-            return res.status(404).send({
-                message: "profile not found",
+        if (!profile) {
+            return res.status(404).json({
+                message: "Profile not found",
                 isProfile: false,
             });
         }
-        return res.status(200).send({
-            message: "profile found",
+        return res.status(200).json({
+            message: "Profile found",
             profile,
         });
     } catch (error) {
-        console.log(error);
-        res.status(400).send({
-            message: "profile not found",
-            error,
+        console.error("GET /profile/:id Error:", error);
+        return res.status(500).json({
+            message: "Failed to fetch profile",
+            error: error.message,
         });
     }
 });
 
+// Update profile (authenticated)
 router.put("/updateprofile/:id", verifyAuth, async (req, res) => {
     try {
         const { id } = req.params;
-        const { first_name, last_name, phone_nuumber, address, email } =
-            req.body;
-        if (
-            (first_name, last_name, phone_nuumber, address, email) == null ||
-            (first_name, last_name, phone_nuumber, address, email) == ""
-        ) {
-            return res.status(400).send({
+        const { first_name, last_name, phone_nuumber, address, email } = req.body;
+
+        if (!first_name || !last_name || !email) {
+            return res.status(400).json({
                 message: "กรุณากรอกข้อมูลให้ครบถ้วน",
                 isprofile: false,
             });
         }
-        let _id = id;
 
-        const profile = await Profiles.findById(_id);
+        const profile = await Profiles.findById(id);
         if (!profile) {
-            return res.status(404).send({
+            return res.status(404).json({
                 message: "User not found",
             });
         }
 
-        await Profiles.findOneAndUpdate(
-            { _id },
-            {
-                first_name,
-                last_name,
-                email,
-                phone_nuumber,
-                address,
-            }
-        );
+        await Profiles.findByIdAndUpdate(id, {
+            first_name,
+            last_name,
+            email,
+            phone_nuumber,
+            address,
+        });
 
-        return res.status(200).send({
+        return res.status(200).json({
             message: "User updated successfully",
         });
     } catch (error) {
-        console.log(error);
-        return res.status(403).send({
-            message: "Authentication failed",
-            error,
+        console.error("PUT /updateprofile Error:", error);
+        return res.status(500).json({
+            message: "Failed to update profile",
+            error: error.message,
         });
     }
 });
 
-router.put("/uploadimage/:id", upload.single("file"), async (req, res) => {
+// Upload profile image (authenticated)
+router.put("/uploadimage/:id", verifyAuth, upload.single("file"), async (req, res) => {
     try {
         const { id } = req.params;
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).send({
-                message: "Unauthenticated",
-            });
-        }
-        const fileSelacter = req.file;
-        let _id = id;
+        const fileSelected = req.file;
 
-        // Check if user exists
-        const Profile = await Profiles.findOne({ _id });
-        if (!Profile) {
-            return res.status(404).send({
+        const profile = await Profiles.findById(id);
+        if (!profile) {
+            return res.status(404).json({
                 message: "User not found",
             });
         }
-        await Profiles.findOneAndUpdate(
-            { _id },
-            {
-                image_path: fileSelacter ? fileSelacter.path : null,
-                image_name: fileSelacter ? fileSelacter.originalname : null,
-            }
-        );
-        return res.status(200).send({
+
+        await Profiles.findByIdAndUpdate(id, {
+            image_path: fileSelected ? fileSelected.path : null,
+            image_name: fileSelected ? fileSelected.originalname : null,
+        });
+
+        return res.status(200).json({
             message: "อัพเดตรูปภาพเรียบร้อยแล้ว",
-            image_path: fileSelacter.path,
+            image_path: fileSelected.path,
         });
     } catch (error) {
-        console.log(error);
-        res.status(403).send({
-            message: "Authentication failed",
-            error,
+        console.error("PUT /uploadimage Error:", error);
+        return res.status(500).json({
+            message: "Failed to upload image",
+            error: error.message,
         });
     }
 });

@@ -1,5 +1,5 @@
 {
-  "name": "front-end-blog-posted",
+  "name": "inkly-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -20,6 +20,7 @@
     "@mui/material": "^5.15.12",
     "axios": "^1.6.8",
     "date-fns": "^4.1.0",
+    "firebase": "^12.10.0",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",

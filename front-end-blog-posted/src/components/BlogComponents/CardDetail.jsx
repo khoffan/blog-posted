@@ -39,19 +39,6 @@ export default function CardDetail({ id }) {
 
 	return (
 		<article className="max-w-[720px] mx-auto px-6 py-12 font-serif text-gray-800">
-			
-			{/* Title */}
-			<h1 className="text-4xl md:text-[42px] font-bold leading-tight mb-8 text-gray-900 tracking-tight">
-				{currentBlog.title}
-			</h1>
-
-			{/* Subtitle / Description (Optional) */}
-			{currentBlog.description && (
-				<p className="text-xl text-gray-500 mb-8 leading-relaxed font-sans font-light">
-					{currentBlog.description}
-				</p>
-			)}
-
 			{/* Author Meta Block */}
 			<div className="flex items-center gap-4 mb-8">
 				<img
@@ -81,6 +68,19 @@ export default function CardDetail({ id }) {
 					</div>
 				</div>
 			</div>
+			{/* Title */}
+			<h1 className="text-4xl md:text-[42px] font-bold leading-tight mb-8 text-gray-900 tracking-tight">
+				{currentBlog.title}
+			</h1>
+
+			{/* Subtitle / Description (Optional) */}
+			{currentBlog.description && (
+				<p className="text-xl text-gray-500 mb-8 leading-relaxed font-sans font-light">
+					{currentBlog.description}
+				</p>
+			)}
+
+			
 
 			{/* Action Bar (Top) */}
 			<div className="flex items-center justify-between border-y border-gray-100 py-3 mb-10 text-gray-500">

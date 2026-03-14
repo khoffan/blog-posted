@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Nav from "../../components/NavbarComponents/Nav";
+
 import Sidebar from "../../components/Sidebar";
 import Blog from "../../components/BlogComponents/Blog";
 import useBlogStore from "../../store/useBlogStore";
@@ -25,9 +25,19 @@ export default function Blogspage() {
 	// Determine if the viewed blogs belong to the currently logged in user
 	const isOwnProfile = user && (user._id === id || user.authid === id);
 
+	const handleEdit = (blogId) => {
+		navigate(`/update-blog/${blogId}`);
+	};
+
+	const handleDelete = async (blogId) => {
+		if (window.confirm("Are you sure you want to delete this story?")) {
+			await useBlogStore.getState().deleteBlog(blogId);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-white flex flex-col font-sans">
-			<Nav />
+
 			<main className="max-w-[720px] lg:max-w-[1040px] mx-auto px-6 pt-10 pb-20 w-full flex-grow">
 				
 				<div className="flex flex-col lg:flex-row gap-12 w-full">
@@ -65,6 +75,8 @@ export default function Blogspage() {
 											tags={blog.tag}
 											isUser={isOwnProfile}
 											thumbnail={blog.blog_image?.[0]?.image_path}
+											onEdit={handleEdit}
+											onDelete={handleDelete}
 										/>
 									</button>
 								))}

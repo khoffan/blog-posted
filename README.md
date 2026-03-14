@@ -1,6 +1,6 @@
 <!-- create descriptstion of the project -->
 
-# Blog-App
+# Inkly
 
 This is a simple blog app that allows users to create, read, update, and delete blog posts.
 

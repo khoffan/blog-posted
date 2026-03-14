@@ -11,19 +11,18 @@ const Blogs = Schema(
             type: String,
             default: null,
         },
+        content: {
+            type: [
+                {
+                    type: { type: String },
+                    content: { type: String }
+                }
+            ],
+            default: []
+        },
         author: {
-            name: {
-                type: String,
-                default: null,
-            },
-            email: {
-                type: String,
-                default: null,
-            },
-            image: {
-                type: String,
-                default: null,
-            },
+            type: String,
+            default: null,
         },
         like: {
             type: Number,

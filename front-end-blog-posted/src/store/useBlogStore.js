@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import useAuthStore from "./useAuthStore";
 
 const API = import.meta.env.VITE_BASE_API_URI;
 
@@ -34,7 +35,6 @@ const useBlogStore = create((set, get) => ({
 		try {
 			const response = await axios.get(`${API}/api/blogs`, {
 				params: { search },
-				withCredentials: true,
 			});
 			set({ blogs: response.data.blogs || [], isLoading: false });
 		} catch (error) {
@@ -46,9 +46,7 @@ const useBlogStore = create((set, get) => ({
 	fetchBlogById: async (id) => {
 		set({ isLoading: true, error: null });
 		try {
-			const response = await axios.get(`${API}/api/blog/${id}`, {
-				withCredentials: true,
-			});
+			const response = await axios.get(`${API}/api/blog/${id}`);
 			set({ currentBlog: response.data.blog, isLoading: false });
 			return response.data.blog;
 		} catch (error) {
@@ -75,9 +73,12 @@ const useBlogStore = create((set, get) => ({
 	createBlog: async (blogData) => {
 		set({ isLoading: true, error: null });
 		try {
+			const headers = {
+				"Content-Type": "application/json",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
 			const response = await axios.post(`${API}/api/creatBlogs`, blogData, {
-				headers: { "Content-Type": "application/json" },
-				withCredentials: true,
+				headers,
 			});
 			if (response.status === 201) {
 				set({ isLoading: false });
@@ -92,18 +93,68 @@ const useBlogStore = create((set, get) => ({
 		}
 	},
 
+	updateBlog: async (id, blogData) => {
+		set({ isLoading: true, error: null });
+		try {
+			const headers = {
+				"Content-Type": "application/json",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
+			const response = await axios.put(`${API}/api/updateblog/${id}`, blogData, {
+				headers,
+			});
+			if (response.status === 200) {
+				set({ isLoading: false });
+				return { success: true, blog: response.data.blog };
+			}
+			set({ isLoading: false });
+			return { success: false };
+		} catch (error) {
+			console.error("Failed to update blog:", error);
+			set({ isLoading: false, error: "Failed to update blog" });
+			return { success: false };
+		}
+	},
+
 	createTag: async (blogid, tagname) => {
 		try {
+			const headers = {
+				"Content-Type": "application/json",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
 			await axios.post(
 				`${API}/api/tags`,
 				{ blogid, tagname },
-				{
-					headers: { "Content-Type": "application/json" },
-					withCredentials: true,
-				}
+				{ headers }
 			);
 		} catch (error) {
 			console.error("Failed to create tag:", error);
+		}
+	},
+
+	deleteBlog: async (id) => {
+		set({ isLoading: true, error: null });
+		try {
+			const headers = {
+				"Content-Type": "application/json",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
+			const response = await axios.delete(`${API}/api/deleteblog/${id}`, {
+				headers,
+			});
+			if (response.status === 200) {
+				set((state) => ({
+					blogs: state.blogs.filter((blog) => blog._id !== id),
+					isLoading: false,
+				}));
+				return { success: true };
+			}
+			set({ isLoading: false });
+			return { success: false };
+		} catch (error) {
+			console.error("Failed to delete blog:", error);
+			set({ isLoading: false, error: "Failed to delete blog" });
+			return { success: false };
 		}
 	},
 
@@ -131,9 +182,12 @@ const useBlogStore = create((set, get) => ({
 		try {
 			const formData = new FormData();
 			formData.append("blog", file);
+			const headers = {
+				"Content-Type": "multipart/form-data",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
 			const response = await axios.post(`${API}/api/blog/images`, formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-				withCredentials: true,
+				headers,
 			});
 			return response.data.file;
 		} catch (error) {

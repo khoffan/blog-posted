@@ -12,6 +12,8 @@ export default function Blog({
 	imageUrl,
 	isUser,
 	thumbnail,
+	onEdit,
+	onDelete,
 }) {
 	Blog.propTypes = {
 		index: PropTypes.string,
@@ -22,6 +24,8 @@ export default function Blog({
 		imageUrl: PropTypes.string,
 		isUser: PropTypes.bool,
 		thumbnail: PropTypes.string,
+		onEdit: PropTypes.func,
+		onDelete: PropTypes.func,
 	};
 
 	const formattedDate = creatDate 
@@ -55,7 +59,7 @@ export default function Blog({
 					{title}
 				</h2>
 				<p className="hidden sm:block text-gray-600 font-serif leading-relaxed line-clamp-2 mb-4">
-					{content || "No preview description available. Click to read the full story on Litium."}
+					{content || "No preview description available. Click to read the full story on Inkly."}
 				</p>
 				
 				{/* Footer Meta (Date, Read Time) */}
@@ -66,9 +70,23 @@ export default function Blog({
 					
 					{/* Status Tag for User Dashboard */}
 					{isUser && (
-						<span className="ml-auto text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-medium">
-							Published
-						</span>
+						<div className="ml-auto flex items-center gap-2">
+							<span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-medium">
+								Published
+							</span>
+							<button 
+								onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit?.(index); }}
+								className="text-xs px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-full font-medium transition-colors"
+							>
+								Edit
+							</button>
+							<button 
+								onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete?.(index); }}
+								className="text-xs px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-full font-medium transition-colors"
+							>
+								Delete
+							</button>
+						</div>
 					)}
 				</div>
 			</div>

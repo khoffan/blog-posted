@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import Tag from "./Tag";
-import useBlogStore from "../store/useBlogStore";
+import useTagStore from "../store/useTagStore";
 
 export default function Tagbar({ sendTags }) {
-	const { allTags, fetchAllTags } = useBlogStore();
+	const { allTags, fetchUniqueTags } = useTagStore();
 
 	useEffect(() => {
-		fetchAllTags();
+		fetchUniqueTags();
 	}, []);
 
 	if (!allTags || allTags.length === 0) return null;
@@ -14,11 +14,10 @@ export default function Tagbar({ sendTags }) {
 	return (
 		<div className="w-full">
 			<div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
-				{/* The plus icon could go here for "Add Topic" */}
 				<div className="flex gap-2">
-					{allTags.map((tag, index) => (
+					{allTags.map((tagName, index) => (
 						<Tag
-							tagName={tag.tagname}
+							tagName={tagName}
 							key={`tag-${index}`}
 							index={index}
 							sendTags={sendTags}

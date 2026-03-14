@@ -1,13 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo-litium.png";
+import logo from "../../assets/logo-inkly.png";
 import UserMenu from "./Usermenu";
 import Authbutton from "./Authbutton";
 import useBlogStore from "../../store/useBlogStore";
 import { useState } from "react";
 
 function Header({
+	dropdownRef,
 	isCreateBlog,
 	isLogin,
 	user = {},
@@ -50,9 +51,9 @@ function Header({
 						<div className="flex items-center gap-2 hover:opacity-80 transition-opacity">
 							{/* Using a generic crisp dot for logo if image isn't great, else use the image */}
 							<div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-serif font-bold italic text-xl leading-none">
-								L
+								I
 							</div>
-							<span className="text-2xl font-serif font-bold tracking-tight text-gray-900 hidden sm:block">Litium</span>
+							<span className="text-2xl font-serif font-bold tracking-tight text-gray-900 hidden sm:block">Inkly</span>
 						</div>
 					</Link>
 					
@@ -92,6 +93,7 @@ function Header({
 
 					{isLogin ? (
 						<UserMenu
+							dropdownRef={dropdownRef}
 							handleDropdown={handleDropdown}
 							handleProfileNavigate={handleProfileNavigate}
 							handleLogout={handleLogout}

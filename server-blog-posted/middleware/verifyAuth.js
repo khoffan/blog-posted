@@ -1,37 +1,37 @@
-const jwt = require("jsonwebtoken");
+const admin = require("../config/firebase_config_admin");
 
-const verifyAuth = (req, res, next) => {
+const verifyAuth = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
-        if (!token) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
                 success: false,
                 message: "Unauthenticated: No token provided",
             });
         }
 
-        jwt.verify(token, process.env.TOKEN_KEY, (err, decoded) => {
-            if (err) {
-                if (err.name === "TokenExpiredError") {
-                    return res.status(401).json({
-                        success: false,
-                        message: "Token has expired",
-                    });
-                }
-                return res.status(401).json({
-                    success: false,
-                    message: "Invalid token",
-                });
-            }
-            
-            req.user = decoded;
-            next();
-        });
+        const idToken = authHeader.split("Bearer ")[1];
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+        req.user = {
+            uid: decodedToken.uid,
+            email: decodedToken.email,
+        };
+
+        next();
     } catch (error) {
-        console.error("verifyAuth Error:", error);
-        return res.status(500).json({
+        console.error("verifyAuth Error:", error.code || error.message);
+
+        if (error.code === "auth/id-token-expired") {
+            return res.status(401).json({
+                success: false,
+                message: "Token has expired",
+            });
+        }
+
+        return res.status(401).json({
             success: false,
-            message: "Internal server error during authentication",
+            message: "Invalid or expired token",
         });
     }
 };

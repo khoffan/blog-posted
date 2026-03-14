@@ -26,14 +26,41 @@ router.get("/tags", async (req, res) => {
     }
 });
 
+// Get unique tag names (flat array for dropdown suggestions)
+router.get("/tags/unique", async (req, res) => {
+    try {
+        const tags = await Tags.distinct("tagname");
+        return res.status(200).json({
+            message: "Unique tags found",
+            tags: tags.sort(),
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Failed to fetch unique tags",
+            error: error.message,
+        });
+    }
+});
+
 router.post("/tags", verifyAuth, async (req, res) => {
     try {
         const { blogid, tagname } = req.body;
         if (!(blogid && tagname)) {
+            console.log("All input is required");
             return res.status(400).send({
                 message: "All input is required",
             });
         }
+        // Check for duplicate tag on this blog
+        const existingTag = await Tags.findOne({ blogid, tagname });
+        if (existingTag) {
+            console.log("Tag already exists on this blog");
+            return res.status(409).json({
+                message: "Tag already exists on this blog",
+                tag: existingTag,
+            });
+        }
+
         const tag = new Tags({
             blogid,
             tagname,
@@ -60,7 +87,7 @@ router.post("/tags", verifyAuth, async (req, res) => {
                 }
             );
         }
-
+        console.log("Tag created and updated successfully");
         return res.status(201).send({
             message: "Tag created and updated successfully",
             tag: saveTag,

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Nav from "../../components/NavbarComponents/Nav";
+
 import Footer from "../../components/Footer";
 import DetailProfile from "../../components/profileComponents/DetailProfile";
 import useUserStore from "../../store/useUserStore";
@@ -20,7 +20,7 @@ export default function Profile() {
 
 	return (
 		<div className="min-h-screen flex flex-col bg-white">
-			<Nav />
+
 			<main className="flex-grow w-full max-w-[1040px] mx-auto px-6 py-12">
 				{isLoading ? (
 					<div className="flex justify-center items-center h-40">

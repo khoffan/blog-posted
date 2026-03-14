@@ -12,9 +12,12 @@ function ProfileAvatar({
 	handleProfileNavigate,
 	handleLogout,
 	handleToBlogPage,
+	dropdownRef,
 }) {
+	if (!user) return null;
+
 	return (
-		<div className="relative flex items-center ml-2 border-l border-gray-200 pl-4">
+		<div ref={dropdownRef} className="relative flex items-center ml-2 border-l border-gray-200 pl-4">
 			<button
 				onClick={handleDropdown}
 				className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
@@ -26,7 +29,7 @@ function ProfileAvatar({
 							? `${API}/${user.image_path}`
 							: "https://api.dicebear.com/7.x/initials/svg?seed=" + (user.first_name || "U")
 					}
-					alt={user.first_name}
+					alt={user.first_name || "User"}
 				/>
 			</button>
 			
@@ -46,6 +49,7 @@ function ProfileAvatar({
 }
 
 function UserMenu({
+	dropdownRef,
 	handleToWriteBlog,
 	user = {},
 	handleDropdown,
@@ -77,6 +81,7 @@ function UserMenu({
 			)}
 
 			<ProfileAvatar
+				dropdownRef={dropdownRef}
 				handleDropdown={handleDropdown}
 				handleLogout={handleLogout}
 				handleProfileNavigate={handleProfileNavigate}

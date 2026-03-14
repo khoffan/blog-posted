@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import useAuthStore from "../../store/useAuthStore";
@@ -6,8 +6,9 @@ import useAuthStore from "../../store/useAuthStore";
 function Nav({ isCreateBlog, publicState }) {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [isDropdown, setIsDropdown] = useState(false);
+	const dropdownRef = useRef(null);
 
-	const { user, isLogin, isImage, fetchUser, logout } = useAuthStore();
+	const { user, isLogin, isImage, initAuth, logout } = useAuthStore();
 	const navigate = useNavigate();
 
 	const toggleSearch = () => {
@@ -15,9 +16,29 @@ function Nav({ isCreateBlog, publicState }) {
 	};
 
 	useEffect(() => {
-		fetchUser();
+		const unsubscribe = initAuth();
+		return () => unsubscribe && unsubscribe();
 	}, []);
 
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+				setIsDropdown(false);
+			}
+		};
+
+		if (isDropdown) {
+			document.addEventListener("mousedown", handleClickOutside);
+		} else {
+			document.removeEventListener("mousedown", handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [isDropdown]);
+
+	console.log("user", user);
 	const handleProfileNavigate = () => {
 		if (isLogin) {
 			navigate(`/user/profile/`);
@@ -63,6 +84,7 @@ function Nav({ isCreateBlog, publicState }) {
 
 	return (
 		<Header
+			dropdownRef={dropdownRef}
 			handleCheckLogin={handleCheckLogin}
 			handleDropdown={handleDropdown}
 			handleLogout={handleLogout}

@@ -42,6 +42,14 @@ export default function FieldData({ id, oldData }) {
 		});
 
 		if (result.success) {
+			useUserStore.getState().setProfile({
+				...oldData,
+				first_name: newProfile.first_name,
+				last_name: newProfile.last_name,
+				email: newProfile.email,
+				address: newProfile.address,
+				phone_nuumber: newProfile.phone,
+			});
 			navigate(-1); // Go back to profile
 		} else {
 			alert(result.message || "Failed to update profile");

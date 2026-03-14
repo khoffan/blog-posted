@@ -21,7 +21,7 @@ const upload = multer({ storage });
 // blogs api
 router.post("/creatBlogs", verifyAuth, async (req, res) => {
 	try {
-		const { title, description, author, blogImage } = req.body;
+		const { title, description, author, blogImage, paragraphs } = req.body;
 		if (!(title && description && author)) {
 			return res.status(400).send({
 				message: "All input is required"
@@ -31,6 +31,7 @@ router.post("/creatBlogs", verifyAuth, async (req, res) => {
 			title,
 			description,
 			author,
+			content: paragraphs,
 			images: blogImage.map((img) => ({
 				imageId: img.id,
 				imageName: img.image_name,
@@ -41,15 +42,16 @@ router.post("/creatBlogs", verifyAuth, async (req, res) => {
 		});
 		await blog.save();
 		const blog_author = await Blogs.findOne({
-			"author.email": author.email
+			"author": author
 		});
 		if (!blog_author) {
 			return res.status(400).send({
 				message: "Blog not found"
 			});
 		}
+		console.log(blog_author);
 		await Profiles.findOneAndUpdate(
-			{ email: blog_author.author.email },
+			{ authid: blog_author.author },
 			{
 				$inc: { blogs_count: 1 }
 			}
@@ -70,16 +72,26 @@ router.post("/creatBlogs", verifyAuth, async (req, res) => {
 router.put("/updateblog/:id", verifyAuth, async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { title, description, author } = req.body;
+		const { title, description, author, paragraphs, blogImage } = req.body;
 		if (!(title && description && author)) {
 			return res.status(400).send({
 				message: "All input is required"
 			});
 		}
 		
+		const updateData = { title, description, author, content: paragraphs };
+		if (blogImage) {
+			updateData.images = blogImage.map((img) => ({
+				imageId: img.id,
+				imageName: img.image_name,
+				imagePath: img.image_path,
+				updatedAt: Date.now()
+			}));
+		}
+
 		const blog = await Blogs.findByIdAndUpdate(
 			id,
-			{ title, description, author },
+			updateData,
 			{ new: true }
 		);
 
@@ -163,20 +175,8 @@ router.get("/blog/:id", async (req, res) => {
 router.get("/blogs/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
-		const profile = await Profiles.findOne({ authid: id });
-		if (!profile) {
-			return res.status(200).send({
-				message: "ไม่มี Profile นี้ในระบบ"
-			});
-		}
-		const email = profile.email;
-		if (!email) {
-			return res.status(200).send({
-				message: "ไม่มี Email นี้ในระบบ"
-			});
-		}
 		const blogs = await Blogs.find({
-			"author.email": email
+			author: id
 		});
 
 		return res.status(200).send({
@@ -184,9 +184,40 @@ router.get("/blogs/:id", async (req, res) => {
 		});
 	} catch (error) {
 		console.log(error);
-		return res.send({
+		return res.status(500).send({
 			message: "ไม่มี blog ของ id นี้",
 			error
+		});
+	}
+});
+
+// delete blog
+router.delete("/deleteblog/:id", verifyAuth, async (req, res) => {
+	try {
+		const { id } = req.params;
+		const blog = await Blogs.findByIdAndDelete(id);
+		
+		if (!blog) {
+			return res.status(404).send({
+				message: "Blog not found"
+			});
+		}
+
+		await Profiles.findOneAndUpdate(
+			{ authid: blog.author },
+			{
+				$inc: { blogs_count: -1 }
+			}
+		);
+
+		return res.status(200).send({
+			message: "Blog deleted successfully",
+			blog
+		});
+	} catch (error) {
+		return res.status(500).send({
+			message: "Failed to delete blog",
+			error: error.message || error
 		});
 	}
 });

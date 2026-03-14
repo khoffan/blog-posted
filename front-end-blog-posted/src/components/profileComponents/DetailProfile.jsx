@@ -8,7 +8,7 @@ export default function DetailProfile({ userObj }) {
 
 	const handleUpdateProfile = () => {
 		if (!userObj) return;
-		navigate(`/user/editprofile/${userObj._id}`);
+		navigate(`/user/editprofile/${userObj.authid}`);
 	};
 
 	if (!userObj) return null;

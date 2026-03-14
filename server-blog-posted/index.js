@@ -3,23 +3,20 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const CookiesParser = require("cookie-parser");
-const session = require("express-session");
 
 require("dotenv").config();
-const connectDB = require("./DB-connect/db_connect");
+const connectDB = require("./config/db_connect");
 // router
 const AuthPath = require("./Controller/auth");
 const ProfilePath = require("./Controller/users");
 const BlogPath = require("./Controller/blogs");
 const CommentsPath = require("./Controller/comments");
 const TagsController = require("./Controller/tags");
-//upload file disk stroage multer
 
 // connect to mongodb
 connectDB();
+
 //use middlewares
-app.use(CookiesParser());
 app.use(bodyParser.json());
 app.use(
 	cors({
@@ -27,7 +24,6 @@ app.use(
 		credentials: true
 	})
 );
-app.use(session({ secret: process.env.SESSION_SECRET || "keyboard cat", resave: false, saveUninitialized: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,7 +38,7 @@ app.use("/api", TagsController);
 
 app.get("/", (req, res) => {
 	res.send({
-		message: "Hello World"
+		message: "Inkly API is running"
 	});
 });
 
@@ -59,5 +55,5 @@ app.use((err, req, res, next) => {
 //listen server
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-	console.log(`Example app listening ${port}`);
+	console.log(`Inkly server listening on port ${port}`);
 });

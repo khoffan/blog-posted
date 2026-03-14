@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import useAuthStore from "./useAuthStore";
 
 const API = import.meta.env.VITE_BASE_API_URI;
 
@@ -30,12 +31,15 @@ const useUserStore = create((set) => ({
 	updateProfile: async (id, data) => {
 		set({ isLoading: true, error: null });
 		try {
+			const headers = {
+				"Content-Type": "application/json",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
 			const response = await axios.put(`${API}/api/updateprofile/${id}`, data, {
-				withCredentials: true,
-				headers: { "Content-Type": "application/json" },
+				headers,
 			});
 			set({ isLoading: false });
-			return { success: true, message: response.data.message || response.data.massage };
+			return { success: true, message: response.data.message };
 		} catch (error) {
 			console.error("Failed to update profile:", error);
 			set({ isLoading: false, error: "Failed to update profile" });
@@ -48,9 +52,12 @@ const useUserStore = create((set) => ({
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
+			const headers = {
+				"Content-Type": "multipart/form-data",
+				...useAuthStore.getState().getAuthHeaders(),
+			};
 			const response = await axios.put(`${API}/api/uploadimage/${id}`, formData, {
-				withCredentials: true,
-				headers: { "Content-Type": "multipart/form-data" },
+				headers,
 			});
 			if (response.data.image_path) {
 				set((state) => ({

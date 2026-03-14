@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import FormField from "../../components/FormField";
 import useAuthStore from "../../store/useAuthStore";
-import logo from "../../assets/logo-litium.png";
 
 export default function Login() {
 	const [email, setEmail] = useState("");
@@ -36,7 +34,7 @@ export default function Login() {
 					<div className="text-center mb-10">
 						<Link to="/" className="inline-block mb-6">
 							<div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-serif font-bold italic text-3xl leading-none mx-auto">
-								L
+								I
 							</div>
 						</Link>
 						<h1 className="text-3xl font-serif tracking-tight text-gray-900 mb-2">Welcome back.</h1>

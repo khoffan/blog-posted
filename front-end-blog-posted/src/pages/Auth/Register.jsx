@@ -49,10 +49,10 @@ export default function Register() {
 					<div className="text-center mb-8">
 						<Link to="/" className="inline-block mb-6">
 							<div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-serif font-bold italic text-3xl leading-none mx-auto">
-								L
+								I
 							</div>
 						</Link>
-						<h1 className="text-3xl font-serif tracking-tight text-gray-900 mb-2">Join Litium.</h1>
+						<h1 className="text-3xl font-serif tracking-tight text-gray-900 mb-2">Join Inkly.</h1>
 						<p className="text-gray-500 text-sm">Create an account to start writing and reading stories.</p>
 					</div>
 

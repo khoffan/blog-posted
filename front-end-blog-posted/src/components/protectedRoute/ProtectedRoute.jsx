@@ -1,27 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/firebase_conf";
 
-export default function ProtechRoute({ redirectPath = "/", children }) {
+export default function ProtectedRoute({ redirectPath = "/", children }) {
 	const location = useLocation();
-
-	const currentPath = location.pathname;
-
-	const [isProtect, setIsprotect] = useState(null);
-
-	const checkToken = () => {
-		const token = Cookies.get("token");
-		console.log("token", typeof token);
-		if (token == null) {
-			setIsprotect(false);
-		} else {
-			setIsprotect(true);
-		}
-	};
+	const [isProtect, setIsProtect] = useState(null);
 
 	useEffect(() => {
-		checkToken();
-	},[]);
+		const unsubscribe = onAuthStateChanged(auth, (user) => {
+			setIsProtect(!!user);
+		});
+		return () => unsubscribe();
+	}, []);
+
+	// Still loading auth state
+	if (isProtect === null) {
+		return null;
+	}
 
 	if (isProtect) {
 		return <Navigate to={redirectPath} />;

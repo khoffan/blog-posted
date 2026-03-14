@@ -3,6 +3,7 @@ import ParagraphField from "./ParagraphField";
 import TagField from "./TagField";
 import useBlogStore from "../../store/useBlogStore";
 import useAuthStore from "../../store/useAuthStore";
+import useTagStore from "../../store/useTagStore";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -10,31 +11,50 @@ export default function CreateBlog() {
 	const navigate = useNavigate();
 	const { createBlog, uploadBlogImage, isLoading } = useBlogStore();
 	const { user } = useAuthStore();
+	const { allTags, fetchUniqueTags, createTag } = useTagStore();
 
 	const [paragraphs, setParagraphs] = useState([{ type: "text", content: "" }]);
 	const [blogImage, setBlogImage] = useState([]); // {id, image_path}
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [isTextnavigate, setIsTextnavigate] = useState([false]);
 	
-	const [inputTag, setInputTag] = useState("");
 	const [tags, setTags] = useState([]);
 	const paragraphRef = useRef([]);
 
 	useEffect(() => {
-		const storeDraft = localStorage.getItem("draftCreateBlog");
+		fetchUniqueTags();
+	}, []);
+	useEffect(() => {
+		if (!user) return;
+		const storeDraft = localStorage.getItem(`draftCreateBlog_${user._id}`);
 		if (storeDraft) {
 			const parsed = JSON.parse(storeDraft);
 			setParagraphs(parsed.paragraphs || [{ type: "text", content: "" }]);
 			setBlogImage(parsed.blogImage || []);
+			setTags(parsed.tags || []);
 		}
-	}, []);
+	}, [user]);
 
-	const saveDraft = (p, bi) => {
-		localStorage.setItem("draftCreateBlog", JSON.stringify({ paragraphs: p, blogImage: bi }));
+	const saveDraft = (newP, newBi, newT) => {
+    	if (!user) return;
+    
+		const draftData = {
+			paragraphs: newP !== undefined ? newP : paragraphs,
+			blogImage: newBi !== undefined ? newBi : blogImage,
+			tags: newT !== undefined ? newT : tags
+		};
+
+    	localStorage.setItem(`draftCreateBlog_${user._id}`, JSON.stringify(draftData));
 	};
 
+	const handleTagsChange = (newTags) => {
+		setTags(newTags);
+		saveDraft(undefined, undefined, newTags);
+	}
+
 	const clearDraft = () => {
-		localStorage.removeItem("draftCreateBlog");
+		if (!user) return;
+		localStorage.removeItem(`draftCreateBlog_${user._id}`);
 	};
 
 	const handleFocus = (index) => {
@@ -59,7 +79,7 @@ export default function CreateBlog() {
 			const newParagraph = [...paragraphs];
 			newParagraph.splice(index + 1, 0, { type: "text", content: "" });
 			setParagraphs(newParagraph);
-			saveDraft(newParagraph, blogImage);
+			saveDraft(newParagraph, blogImage, undefined);
 
 			setTimeout(() => {
 				if (paragraphRef.current[index + 1]) {
@@ -71,7 +91,7 @@ export default function CreateBlog() {
 			const newParagraph = [...paragraphs];
 			newParagraph.splice(index, 1);
 			setParagraphs(newParagraph);
-			saveDraft(newParagraph, blogImage);
+			saveDraft(newParagraph, blogImage, undefined);
 
 			setTimeout(() => {
 				if (paragraphRef.current[index - 1]) {
@@ -105,7 +125,7 @@ export default function CreateBlog() {
 			
 			const newNavState = Array(newParagraph.length).fill(false);
 			setIsTextnavigate(newNavState);
-			saveDraft(newParagraph, newBlogImages);
+			saveDraft(newParagraph, newBlogImages, undefined);
 			
 			setTimeout(() => {
 				if (paragraphRef.current[index + 1]) {
@@ -128,23 +148,7 @@ export default function CreateBlog() {
 		
 		setParagraphs(newParagraph);
 		setBlogImage(newBlogImages);
-		saveDraft(newParagraph, newBlogImages);
-	};
-
-	const handleInputChange = (e) => setInputTag(e.target.value);
-
-	const handleTagInputKey = (e) => {
-		if (e.key === "Enter" && inputTag.trim() !== "") {
-			e.preventDefault();
-			if (!tags.includes(inputTag.trim())) {
-				setTags([...tags, inputTag.trim()]);
-			}
-			setInputTag("");
-		}
-	};
-
-	const handleCloseTag = (tagToRemove) => {
-		setTags(tags.filter(tag => tag !== tagToRemove));
+		saveDraft(newParagraph, newBlogImages, undefined);
 	};
 
 	const handleUploadBlog = async () => {
@@ -168,14 +172,20 @@ export default function CreateBlog() {
 			description,
 			tags,
 			paragraphs,
-			imagePath: blogImage,
-			userId: user._id,
-			name: user.first_name + " " + user.last_name,
-			userImage: user.image_path || ""
+			blogImage,
+			author: user.authid,
 		};
 
 		const result = await createBlog(blogData);
 		if (result.success) {
+			// Persist each tag to the Tags collection via store
+			const blogId = result.blog?._id;
+			if (blogId && tags.length > 0) {
+				await Promise.all(
+					tags.map((tagname) => createTag(blogId, tagname))
+				);
+			}
+
 			clearDraft();
 			Swal.fire("Published!", "Your story is live.", "success").then(() => {
 				navigate("/");
@@ -221,11 +231,9 @@ export default function CreateBlog() {
 				{/* Tag Editor */}
 				<div className="mt-16 pt-8 border-t border-gray-100">
 					<TagField
-						tags={tags}
-						inputTag={inputTag}
-						handleInputChange={handleInputChange}
-						handleTagInputKey={handleTagInputKey}
-						handleCloseTag={handleCloseTag}
+						selectedTags={tags}
+						onTagsChange={handleTagsChange}
+						allTags={allTags}
 					/>
 				</div>
 			</div>
