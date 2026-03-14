@@ -8,7 +8,6 @@ export default function BlogDetail() {
 
 	return (
 		<div className="min-h-screen bg-white">
-
 			<main className="w-full">
 				<CardDetail id={id} />
 			</main>

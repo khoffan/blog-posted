@@ -13,11 +13,9 @@ import BlogDetail from "./pages/Posts/BlogDetail.jsx";
 
 import BlogUpdate from "./components/BlogComponents/BlogUpdate.jsx";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <Nav />
-      <Routes>
+
+const element = (
+  <Routes>
         <Route path="/" element={<Home />} />
         <Route
           path="/login"
@@ -42,7 +40,16 @@ function App() {
         <Route path="/blog/detail/:id" element={<BlogDetail />} />
         <Route path="/update-blog/:id" element={<BlogUpdate />} />
       </Routes>
-    </BrowserRouter>
+)
+
+
+function App() {
+  return (
+      <>
+        <Nav />
+        {element}
+      </>
+      
   );
 }
 

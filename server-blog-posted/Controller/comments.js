@@ -20,7 +20,7 @@ router.post("/comment", verifyAuth, async (req, res) => {
 		});
 
 		await comment.save();
-		return res.send({ message: "เพิ่ม comment สำเร็จ" });
+		return res.status(201).send({ message: "เพิ่ม comment สำเร็จ", comment });
 	} catch (error) {
 		console.log(error);
 		return res.send({
@@ -30,16 +30,16 @@ router.post("/comment", verifyAuth, async (req, res) => {
 	}
 });
 
-router.get("/comments", async (req, res) => {
+router.get("/comments/:blogid", async (req, res) => {
 	try {
-		const commentsData = await Comments.find();
+		const { blogid } = req.params;
+		const commentsData = await Comments.find({ blogid }).sort({ createdAt: -1 });
 		if (!commentsData) {
 			res.send({
 				message: "ไม่มีข้อมูล"
 			});
 		}
-		console.log(commentsData);
-		res.send({
+		res.status(200).send({
 			commentsData
 		});
 	} catch (error) {
