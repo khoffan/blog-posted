@@ -37,10 +37,25 @@ export default function Blog({
 		: "https://api.dicebear.com/7.x/initials/svg?seed=" + (name || "U");
 
 	return (
-		<article className="py-8 flex flex-col md:flex-row gap-8 items-start justify-between cursor-pointer w-full">
-			
-			{/* Left Content Area */}
-			<div className="flex-1 min-w-0 pr-4 flex flex-col h-full w-full">
+		<article className="flex flex-col h-full w-full">
+			{/* Top Thumbnail Image Area */}
+			{thumbnail ? (
+				<div className="w-full aspect-video md:aspect-[4/3] w-full shrink-0 overflow-hidden">
+					<img 
+						src={`${API}/${thumbnail}`} 
+						alt={title}
+						className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+					/>
+				</div>
+			) : (
+				// Fallback generic pattern if no thumbnail
+				<div className="w-full aspect-video md:aspect-[4/3] shrink-0 bg-gray-50 border-b border-gray-100 flex items-center justify-center">
+					<div className="w-full h-full opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiPjwvcGF0aD4KPC9zdmc+')]"></div>
+				</div>
+			)}
+
+			{/* Content Area */}
+			<div className="flex-1 min-w-0 flex flex-col p-4 md:p-5 h-full w-full bg-white">
 				
 				{/* Author Meta */}
 				<div className="flex items-center gap-2 mb-3">
@@ -50,39 +65,39 @@ export default function Blog({
 						alt={name}
 					/>
 					<span className="text-sm text-gray-900 font-medium truncate">{name}</span>
-					<span className="text-sm text-gray-500 hidden sm:inline">in</span>
-					<span className="text-sm text-gray-900 font-medium hidden sm:inline">Programming</span> {/* Mock topic for design */}
+					<span className="text-[13px] text-gray-500 hidden sm:inline">in</span>
+					<span className="text-[13px] text-gray-900 font-medium hidden sm:inline truncate">Programming</span> {/* Mock topic for design */}
 				</div>
 				
 				{/* Title & Excerpt */}
-				<h2 className="text-xl md:text-2xl font-serif font-bold text-gray-900 leading-tight mb-2 group-hover:text-black line-clamp-2">
+				<h2 className="text-lg md:text-xl font-serif font-bold text-gray-900 leading-tight mb-2 group-hover:text-black line-clamp-2">
 					{title}
 				</h2>
-				<p className="hidden sm:block text-gray-600 font-serif leading-relaxed line-clamp-2 mb-4">
+				<p className="text-sm md:text-base text-gray-600 font-serif leading-relaxed line-clamp-2 md:line-clamp-3 mb-4">
 					{content || "No preview description available. Click to read the full story on Inkly."}
 				</p>
 				
 				{/* Footer Meta (Date, Read Time) */}
-				<div className="flex items-center gap-4 mt-auto pt-2">
-					<span className="text-[13px] text-gray-500">{formattedDate}</span>
-					<div className="w-1 h-1 rounded-full bg-gray-300 hidden sm:block"></div>
-					<span className="text-[13px] text-gray-500 hidden sm:block">4 min read</span>
+				<div className="flex flex-wrap items-center gap-2 md:gap-4 mt-auto pt-4 border-t border-gray-50">
+					<span className="text-[13px] text-gray-500 shrink-0">{formattedDate}</span>
+					<div className="w-1 h-1 rounded-full bg-gray-300 hidden sm:block shrink-0"></div>
+					<span className="text-[13px] text-gray-500 hidden sm:block shrink-0">4 min read</span>
 					
 					{/* Status Tag for User Dashboard */}
 					{isUser && (
 						<div className="ml-auto flex items-center gap-2">
-							<span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-medium">
+							<span className="text-[10px] md:text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full font-medium">
 								Published
 							</span>
 							<button 
 								onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit?.(index); }}
-								className="text-xs px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-full font-medium transition-colors"
+								className="text-[10px] md:text-xs px-2 md:px-3 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-full font-medium transition-colors"
 							>
 								Edit
 							</button>
 							<button 
 								onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete?.(index); }}
-								className="text-xs px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-full font-medium transition-colors"
+								className="text-[10px] md:text-xs px-2 md:px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-full font-medium transition-colors"
 							>
 								Delete
 							</button>
@@ -90,23 +105,6 @@ export default function Blog({
 					)}
 				</div>
 			</div>
-
-			{/* Right Thumbnail Image Area (Medium style) */}
-			{thumbnail ? (
-				<div className="w-full md:w-[160px] h-[160px] md:h-[108px] shrink-0 overflow-hidden sm:mt-8 md:mt-0">
-					<img 
-						src={`${API}/${thumbnail}`} 
-						alt={title}
-						className="w-full h-full object-cover rounded-sm border border-gray-100 hidden sm:block"
-					/>
-				</div>
-			) : (
-				// Fallback generic pattern if no thumbnail
-				<div className="hidden sm:block w-[160px] h-[108px] shrink-0 bg-gray-50 border border-gray-100 rounded-sm">
-					<div className="w-full h-full opacity-20 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDBMOCA4Wk04IDBMMCA4WiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiPjwvcGF0aD4KPC9zdmc+')]"></div>
-				</div>
-			)}
-			
 		</article>
 	);
 }

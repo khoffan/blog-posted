@@ -44,19 +44,19 @@ export default function Blogspage() {
         <meta name="keywords" content="stories, blog, stories" />
       </Helmet>
       <div className="min-h-screen bg-white flex flex-col font-sans">
-        <main className="max-w-[720px] lg:max-w-[1040px] mx-auto px-6 pt-10 pb-20 w-full flex-grow">
-          <div className="flex flex-col lg:flex-row gap-12 w-full">
+        <main className="max-w-[1240px] mx-auto px-4 md:px-6 pt-6 md:pt-10 pb-20 w-full flex-grow">
+          <div className="flex flex-col xl:flex-row gap-12 w-full">
             {/* Main Feed */}
-            <div className="flex-1 w-full lg:max-w-[680px]">
+            <div className="flex-1 w-full">
               <div className="pb-8 border-b border-gray-100 mb-8 mt-4">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900 font-serif">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 font-serif">
                   {isOwnProfile ? "Your stories" : "Stories"}
                 </h1>
-                <div className="flex gap-6 mt-6 border-b border-gray-100">
-                  <button className="text-sm font-medium text-black border-b-2 border-black pb-3">
+                <div className="flex gap-4 md:gap-6 mt-6 border-b border-gray-100 overflow-x-auto whitespace-nowrap hide-scrollbar">
+                  <button className="text-sm font-medium text-black border-b-2 border-black pb-3 min-w-[70px] text-center min-h-[44px]">
                     Published
                   </button>
-                  <button className="text-sm font-medium text-gray-500 pb-3 hover:text-black">
+                  <button className="text-sm font-medium text-gray-500 pb-3 hover:text-black min-w-[50px] text-center min-h-[44px]">
                     Drafts
                   </button>
                 </div>
@@ -67,11 +67,11 @@ export default function Blogspage() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                 </div>
               ) : blogs && blogs.length > 0 ? (
-                <div className="flex flex-col divide-y divide-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 list-none">
                   {blogs.map((blog) => (
-                    <button
+                    <div
                       key={blog._id}
-                      className="w-full text-left group hover:bg-gray-50 transition-colors -mx-4 px-4 rounded-xl block"
+                      className="w-full text-left group hover:bg-gray-50 transition-colors border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md cursor-pointer flex flex-col h-full"
                       onClick={() => blogDetail(blog._id)}
                     >
                       <Blog
@@ -87,7 +87,7 @@ export default function Blogspage() {
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                       />
-                    </button>
+                    </div>
                   ))}
                 </div>
               ) : (
